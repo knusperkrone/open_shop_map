@@ -1,0 +1,12 @@
+version: '3.1'
+
+services:
+  db_open_shop:
+    image: kartoza/postgis:12.0
+    restart: always
+    environment:
+      POSTGRES_DB: shop_db
+      POSTGRES_USER: open_data
+      POSTGRES_PASSWORD: 0808ee1360fd717cb5a23961ddc3863f
+    ports:
+        - 5432:5432
