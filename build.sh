@@ -6,6 +6,4 @@ cd -
 
 cd rust-backend
 ./build.sh
-./run.sh
 cd -
-
