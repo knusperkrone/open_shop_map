@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /bin/sh
 
 diesel migration run
-cargo build --release
+cargo build

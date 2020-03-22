@@ -1,6 +1,6 @@
 # Open Shop Map
 
-[See here!](https://devpost.com/software/16_lokale-unternehmen_openshopmap#updates)
+[See here!](https://devpost.com/software/16_lokale-unternehmen_openshopmap)
 
 ## Getting Started
 
@@ -35,8 +35,10 @@ sudo docker-compose up
 To start the application run:
 
 ```bash
-sudo -i -u $USER bash cd $PWD && ./deploy.sh
+./deploy.sh
 ```
+
+then open your browser under ```localhost:8000```
 
 ## License
 

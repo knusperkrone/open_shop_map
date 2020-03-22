@@ -9,4 +9,4 @@ services:
       POSTGRES_USER: open_data
       POSTGRES_PASSWORD: 0808ee1360fd717cb5a23961ddc3863f
     ports:
-        - 5432:5432
+        - 54321:5432
