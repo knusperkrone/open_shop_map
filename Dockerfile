@@ -40,7 +40,7 @@ RUN ng build --prod --deploy-url /static/ --output-path dist/
 # Compile backend
 WORKDIR /home/app/rust-backend
 RUN ~/.cargo/bin/cargo build
-RUN echo "ACTIX_WEB_BIND=localhost:8000" >> .env
+RUN echo "ACTIX_WEB_BIND=0.0.0.0:8000" >> .env
 RUN echo "DATABASE_URL=postgres://open_data:0808ee1360fd717cb5a23961ddc3863f@database:5432/shop_db" >> .env
 
 # Ready to run

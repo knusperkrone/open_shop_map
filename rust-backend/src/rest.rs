@@ -184,7 +184,8 @@ async fn update_shop(
 
 pub async fn dispatch_server() {
     // Set up logging
-    info!(APP_LOGGING, "Start listening to REST endpoints");
+    let bind = env::var("ACTIX_WEB_BIND").expect("DACTIX_WEB_BINDATABASE_URL must be set");
+    info!(APP_LOGGING, "Start listening to REST endpoints on {}", bind);
     std::env::set_var("RUST_LOG", "actix_web=debug");
     env_logger::init();
     let conn_mtx = Arc::new(Mutex::new(establish_db_connection()));
@@ -211,7 +212,7 @@ pub async fn dispatch_server() {
                     .route(web::put().to(update_shop)),
             )
     })
-    .bind("127.0.0.1:8000")
+    .bind(bind)
     .unwrap()
     .run()
     .await
