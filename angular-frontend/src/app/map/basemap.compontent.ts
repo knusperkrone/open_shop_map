@@ -7,17 +7,12 @@ import { Router } from '@angular/router';
 
 export abstract class BaseMapComponent implements AfterViewInit {
 
-  private lat: number;
-  private lng: number;
-  private zoom: number;
+  private prevState: MapState;
 
   constructor(protected locationService: LocationService, private router: Router) {
     // Get previous mapState
     if (this.router?.getCurrentNavigation()?.extras.state) {
-      const state = this.router?.getCurrentNavigation()?.extras.state as MapState;
-      this.lat = state.lat;
-      this.lng = state.lng;
-      this.zoom = state.zoom;
+      this.prevState = this.router?.getCurrentNavigation()?.extras.state as MapState;
     }
   }
 
@@ -26,8 +21,8 @@ export abstract class BaseMapComponent implements AfterViewInit {
   cluster: MarkerClusterer;
 
   ngAfterViewInit(): void {
-    if (this.lat && this.lng && this.zoom) {
-      this.initMap(this.lat, this.lng, this.zoom);
+    if (this.prevState) {
+      this.initMap(this.prevState.lat, this.prevState.lng, this.prevState.zoom);
     } else if (navigator.geolocation) {
       let me = this;
       navigator.geolocation.getCurrentPosition((position) => {
@@ -44,7 +39,7 @@ export abstract class BaseMapComponent implements AfterViewInit {
     if (msg) {
       console.log(msg);
     }
-    this.initMap(51.138626, 10.292077);
+    this.initMap(51.138626, 10.292077, 7);
   }
 
   initMap(lat: number, lng: number, zoom: number = 14) {
@@ -102,13 +97,12 @@ export abstract class BaseMapComponent implements AfterViewInit {
 
   navigate(path: string) {
     let center = this.map.getCenter();
-    this.router.navigateByUrl(path, {
-      state: {
-        lat: center.lat(),
-        lng: center.lng(),
-        zoom: this.map.getZoom(),
-      }
-    });
+    let mapState: MapState = {
+      lat: center.lat(),
+      lng: center.lng(),
+      zoom: this.map.getZoom(),
+    };
+    this.router.navigateByUrl(path, { state: mapState });
   }
 
   abstract composeMarker(marker: google.maps.Marker, shop: Shop);

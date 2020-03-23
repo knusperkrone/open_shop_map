@@ -1,10 +1,11 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
 import { LocationService } from '../../service/location.service';
 import { PlacesService } from '../../service/places.service';
-import { NewContentComponent } from './newcontent/newcontent.component';
+//import { NewContentComponent } from './newcontent/newcontent.component';
 import { BaseMapComponent } from '../basemap.compontent';
 import { Shop } from 'src/app/models/dto';
 import { Router } from '@angular/router';
+import { EditContentComponent } from './editcontent/editcontent.component';
 
 @Component({
   selector: 'app-editmap',
@@ -12,13 +13,12 @@ import { Router } from '@angular/router';
   styleUrls: ['./editmap.component.scss']
 })
 export class EditmapComponent extends BaseMapComponent {
-
   constructor(locationService: LocationService, router: Router, private placeService: PlacesService) {
     super(locationService, router);
   }
 
   @ViewChild('infoContainer', { static: false }) infowindowContent: ElementRef;
-  @ViewChild('infoContent', { static: false }) contentChild: NewContentComponent;
+  @ViewChild('infoContent', { static: false }) contentChild: EditContentComponent;
   infowindow: google.maps.InfoWindow;
 
   getMapStyles(): google.maps.MapTypeStyle[] {

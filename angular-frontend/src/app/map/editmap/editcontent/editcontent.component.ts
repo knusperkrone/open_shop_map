@@ -1,18 +1,17 @@
 import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
+import { Shop } from 'src/app/models/dto';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { LocationService } from 'src/app/service/location.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Shop } from 'src/app/models/dto';
-import { Observable } from 'rxjs';
-const normalizeUrl = require('normalize-url');
-
 
 @Component({
-  selector: 'app-newcontent',
-  templateUrl: './newcontent.component.html',
-  styleUrls: ['./newcontent.component.scss']
+  selector: 'app-editcontent',
+  templateUrl: './editcontent.component.html',
+  styleUrls: ['./editcontent.component.scss']
 })
-export class NewContentComponent implements OnInit {
+export class EditContentComponent implements OnInit {
+
   insertGroup: FormGroup;
 
   place: any;
@@ -65,12 +64,12 @@ export class NewContentComponent implements OnInit {
       let request: Observable<Shop>;
       let msg: string;
       if (this.shop != null) {
-        this.shop.url = this.url().value;
+        const url = this.normalizeUrl(this.url().value);
         request = this.locationService.updateLocation(this.shop);
         msg = "geupdated";
       } else {
         const geometry: google.maps.LatLng = this.place.geometry.location;
-        const url = normalizeUrl(this.url().value);
+        const url = this.normalizeUrl(this.url().value);
         request = this.locationService.insertLocation(geometry.lng(), geometry.lat(), this.place.name, url, "")
         msg = "eingtragen";
       }
@@ -114,6 +113,13 @@ export class NewContentComponent implements OnInit {
 
     document.getElementById('place-name').textContent = shop.title;
     this.url().setValue(shop.url);
+  }
+
+  private normalizeUrl(url: string): string {
+    if (!url.startsWith("http://") || !url.startsWith("https://")) {
+      return "http://" + url;
+    }
+    return url;
   }
 
 }
