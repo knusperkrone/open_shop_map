@@ -7,6 +7,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
+import { AboutComponent } from './about/about.component';
 import { ShowMapComponent } from "./map/showmap/showmap.component";
 import { ShowContentComponent } from './map/showmap/showcontent/showcontent.component';
 import { EditmapComponent } from './map/editmap/editmap.component';
@@ -15,9 +16,10 @@ import { PlacesService } from './service/places.service';
 import { ShopService } from './service/location.service';
 
 import { MatButtonModule } from '@angular/material/button';
-import {MatCardModule} from '@angular/material/card';
+import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBarModule } from '@angular/material/snack-bar'
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
@@ -33,6 +35,7 @@ import { ClickContentComponent } from './map/clickcontent/clickcontent.component
     EditmapComponent,
     EditContentComponent,
     ClickContentComponent,
+    AboutComponent,
   ],
   imports: [
     HttpClientModule,
@@ -44,6 +47,7 @@ import { ClickContentComponent } from './map/clickcontent/clickcontent.component
     MatButtonModule,
     MatCardModule,
     MatDividerModule,
+    MatIconModule,
     MatInputModule,
     MatFormFieldModule,
     MatSlideToggleModule,
