@@ -1,9 +1,10 @@
 <div #mapContainer id="map"></div>
 
-<div #infoContainer id="infowindow-content">
+<div #infoContainer class="infowindow-content">
   <app-showcontent #infoContent></app-showcontent>
 </div>
 
+<ng-template #clickContainer class="infowindow-content"></ng-template>
 
 <div class="fab-container">
   <button mat-fab color="accent" (click)="navigate('/edit')">Edit</button>

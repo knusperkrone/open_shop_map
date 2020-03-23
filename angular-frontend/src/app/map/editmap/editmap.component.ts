@@ -1,11 +1,12 @@
-import { Component, ViewChild, ElementRef } from '@angular/core';
+import { Component, ViewChild, ElementRef, Renderer2, ComponentFactoryResolver, ViewContainerRef } from '@angular/core';
 import { ShopService } from '../../service/location.service';
 import { PlacesService } from '../../service/places.service';
-//import { NewContentComponent } from './newcontent/newcontent.component';
 import { BaseMapComponent } from '../basemap.compontent';
 import { Shop } from 'src/app/models/dto';
 import { Router } from '@angular/router';
 import { EditContentComponent } from './editcontent/editcontent.component';
+import { RouterExtra } from 'src/app/models/state';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-editmap',
@@ -13,13 +14,31 @@ import { EditContentComponent } from './editcontent/editcontent.component';
   styleUrls: ['./editmap.component.scss']
 })
 export class EditmapComponent extends BaseMapComponent {
-  constructor(locationService: ShopService, router: Router, private placeService: PlacesService) {
-    super(locationService, router);
+
+  private editShop: Shop;
+
+  constructor(private snackBar: MatSnackBar, private placeService: PlacesService, locationService: ShopService, router: Router, componentFactoryResolver: ComponentFactoryResolver, renderer: Renderer2) {
+    super(locationService, router, componentFactoryResolver, renderer);
+    if (router?.getCurrentNavigation()?.extras?.state) {
+      let state = router?.getCurrentNavigation()?.extras.state as RouterExtra;
+      this.editShop = state.payload;
+    }
   }
 
   @ViewChild('infoContainer', { static: false }) infowindowContent: ElementRef;
   @ViewChild('infoContent', { static: false }) contentChild: EditContentComponent;
+  @ViewChild('clickContainer', { read: ViewContainerRef }) clickWindowContent: ViewContainerRef;
   infowindow: google.maps.InfoWindow;
+
+  ngAfterViewInit() {
+    super.ngAfterViewInit();
+    setTimeout(() => {
+      if (this.editShop) {
+        this.markerClick(this.editShop);
+        this.editShop = null;
+      }
+    }, 0);
+  }
 
   getMapStyles(): google.maps.MapTypeStyle[] {
     return [
@@ -47,21 +66,40 @@ export class EditmapComponent extends BaseMapComponent {
     this.contentChild.setCloseCallback(() => me.infowindow.close());
     this.contentChild.setAddShopCallback((shop) => me.cluster.addMarker(me.addShopMarker(shop)));
     this.contentChild.setUpdateShopCallback((shop) => { /* TODO: */ })
-    this.map.addListener('click', (event) => me.poiClickListener(event));
+    this.map.addListener('click', (event) => me.poiClick(event));
+    this.map.addListener('rightclick', (event) => me.rightClick(event));
     google.maps.event.addListener(this.infowindow, 'closeclick', () => me.contentChild.reset());
   }
 
   composeMarker(marker: google.maps.Marker, shop: Shop) {
     const me = this;
-    google.maps.event.addDomListener(marker, 'click', function () {
-      me.infowindow.setPosition(marker.getPosition());
-      me.infowindow.open(this.map);
-      me.contentChild.setShop(shop);
-    });
+    google.maps.event.addDomListener(marker, 'rightclick', () => me.markerClick(shop)); // TODO: Overlay?
+    google.maps.event.addDomListener(marker, 'click', () => me.markerClick(shop));
   }
 
-  private poiClickListener(event: any) {
-    console.dir(event);
+  private rightClick(event) {
+    this.showOverlay(
+      "Shop hinzufügen",
+      () => {
+        this.closeOverlay();
+        this.map.setZoom(Math.max(16, this.map.getZoom()));
+        this.map.panTo(event.latLng);
+        this.snackBar.open(`Um einen Shop hinzuzufügen klicke auf einen Maps Eintrag!`, "Ok", {
+          duration: 6000,
+        });
+      },
+      event,
+      this.clickWindowContent,
+    );
+  }
+
+  private markerClick(shop: Shop) {
+    this.infowindow.setPosition(new google.maps.LatLng(shop.lat, shop.lon));
+    this.infowindow.open(this.map);
+    this.contentChild.setShop(shop);
+  }
+
+  private poiClick(event: any) {
     event.stop();
     if (event.placeId) {
       const me = this;

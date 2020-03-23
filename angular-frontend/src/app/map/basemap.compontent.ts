@@ -1,18 +1,20 @@
-import { AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import { AfterViewInit, ViewChild, ElementRef, ViewContainerRef, ComponentFactoryResolver, Renderer2 } from '@angular/core';
 import { ShopService } from '../service/location.service';
 import { Shop } from '../models/dto';
-import { MapState } from '../models/state';
+import { MapState, RouterExtra } from '../models/state';
 import { Router } from '@angular/router';
+import { ClickContentComponent } from './clickcontent/clickcontent.component';
 
 
 export abstract class BaseMapComponent implements AfterViewInit {
 
+  private overlay: google.maps.OverlayView;
   private prevState: MapState;
 
-  constructor(protected locationService: ShopService, private router: Router) {
-    // Get previous mapState
+  constructor(protected locationService: ShopService, private router: Router, private componentFactoryResolver: ComponentFactoryResolver, private renderer: Renderer2) {
     if (this.router?.getCurrentNavigation()?.extras.state) {
-      this.prevState = this.router?.getCurrentNavigation()?.extras.state as MapState;
+      let state = this.router?.getCurrentNavigation()?.extras.state as RouterExtra;
+      this.prevState = state.map;
     }
   }
 
@@ -53,6 +55,8 @@ export abstract class BaseMapComponent implements AfterViewInit {
 
 
     this.map = new google.maps.Map(this.gmap.nativeElement, mapOptions);
+    this.map.addListener("dragstart", (_) => { this.overlay?.onRemove(); this.overlay = null });
+    this.map.addListener("click", (_) => { this.overlay?.onRemove(); this.overlay = null });
 
     const me = this;
     google.maps.event.addListener(this.map, 'idle', () => {
@@ -95,18 +99,78 @@ export abstract class BaseMapComponent implements AfterViewInit {
     return marker;
   }
 
-  navigate(path: string) {
+  navigate(path: string, data: any = undefined) {
     let center = this.map.getCenter();
     let mapState: MapState = {
       lat: center.lat(),
       lng: center.lng(),
       zoom: this.map.getZoom(),
     };
-    this.router.navigateByUrl(path, { state: mapState });
+
+    let extra: RouterExtra = {
+      map: mapState,
+      payload: data,
+    };
+    this.router.navigateByUrl(path, { state: extra });
+  }
+
+  showOverlay(msg: string, callback: VoidFunction, event: any, container: ViewContainerRef) {
+    this.overlay?.onRemove();
+    this.overlay = new ClickContextMenuOverlay(
+      msg,
+      callback,
+      event,
+      container,
+      this.componentFactoryResolver,
+      this.renderer,
+    );
+    this.overlay.setMap(this.map);
+  }
+
+  closeOverlay() {
+    this.overlay?.onRemove();
+    this.overlay = null;
   }
 
   abstract composeMarker(marker: google.maps.Marker, shop: Shop);
   abstract mapInited();
   abstract getMapStyles(): google.maps.MapTypeStyle[];
+}
+
+
+class ClickContextMenuOverlay extends google.maps.OverlayView {
+
+  private ref: any;
+
+  constructor(private msg: string, private callback: VoidFunction, private event: any, private containerRef: ViewContainerRef, private componentFactoryResolver: ComponentFactoryResolver, private renderer: Renderer2) {
+    super();
+  }
+
+  onAdd() {
+    const componentFactory = this.componentFactoryResolver.resolveComponentFactory(ClickContentComponent);
+    const componentRef = this.containerRef.createComponent(componentFactory);
+    this.ref = componentRef;
+    (<ClickContentComponent>componentRef.instance).msg = this.msg;
+    (<ClickContentComponent>componentRef.instance).callback = this.callback;
+  };
+
+  draw() {
+    let pixel;
+    if (!this.event.pixel) {
+      pixel = this.getProjection().fromLatLngToContainerPixel(this.event);
+    } else {
+      pixel = this.event.pixel;
+      pixel.y += 54;
+    }
+
+    const element = this.ref.location.nativeElement;
+    this.renderer.setStyle(element, "position", "absolute");
+    this.renderer.setStyle(element, "left", pixel.x + 'px');
+    this.renderer.setStyle(element, "top", (pixel.y) + 'px');
+  };
+
+  onRemove() {
+    this.containerRef.remove(0);
+  }
 
 }

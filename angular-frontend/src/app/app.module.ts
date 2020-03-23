@@ -15,12 +15,14 @@ import { PlacesService } from './service/places.service';
 import { ShopService } from './service/location.service';
 
 import { MatButtonModule } from '@angular/material/button';
+import {MatCardModule} from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBarModule } from '@angular/material/snack-bar'
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { ClickContentComponent } from './map/clickcontent/clickcontent.component';
 
 
 @NgModule({
@@ -30,6 +32,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
     ShowContentComponent,
     EditmapComponent,
     EditContentComponent,
+    ClickContentComponent,
   ],
   imports: [
     HttpClientModule,
@@ -39,6 +42,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
     FormsModule,
     ReactiveFormsModule,
     MatButtonModule,
+    MatCardModule,
     MatDividerModule,
     MatInputModule,
     MatFormFieldModule,

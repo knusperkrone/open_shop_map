@@ -8,8 +8,6 @@
       <mat-error>{{getErrorMessage()}}</mat-error>
     </mat-form-field>
   </div>
-
-  <mat-slide-toggle class="padding-bottom" formControlName="coupon">Gutschein</mat-slide-toggle>
   <div mat-dialog-actions>
     <button mat-raised-button color="warn" (click)=abort()>Abbruch</button>
     <button mat-raised-button style="margin-left: 10px;" color="accent" (click)=submit()>Hinzufügen</button>
