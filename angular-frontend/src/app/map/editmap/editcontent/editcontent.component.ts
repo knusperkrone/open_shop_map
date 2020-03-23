@@ -120,7 +120,7 @@ export class EditContentComponent implements OnInit {
   }
 
   private normalizeUrl(url: string): string {
-    if (!url.startsWith("http://") || !url.startsWith("https://")) {
+    if (!url.startsWith("http://") && !url.startsWith("https://")) {
       return "http://" + url;
     }
     return url;
