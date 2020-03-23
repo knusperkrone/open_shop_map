@@ -35,13 +35,13 @@ COPY rust-backend/src ./rust-backend/src
 # Compile frontend
 WORKDIR /home/app/angular-frontend
 RUN yes n | npm i
-RUN ng build --prod --deploy-url /static/ --output-path dist/
+RUN ng build --deploy-url /static/ --output-path dist/
 
 # Compile backend
 WORKDIR /home/app/rust-backend
-RUN ~/.cargo/bin/cargo build
-RUN echo "ACTIX_WEB_BIND=0.0.0.0:8000" >> .env
+RUN echo "BIND=0.0.0.0:8000" >> .env
 RUN echo "DATABASE_URL=postgres://open_data:0808ee1360fd717cb5a23961ddc3863f@database:5432/shop_db" >> .env
+RUN ~/.cargo/bin/cargo build
 
 # Ready to run
 CMD ~/.cargo/bin/diesel migration run && \

@@ -5,9 +5,10 @@ use crate::valiator;
 use actix_cors::Cors;
 use actix_files;
 use actix_web::{guard, middleware, web, App, HttpResponse, HttpServer};
-use actix_web::http::header::{ContentDisposition, DispositionType};
 use diesel::PgConnection;
 use diesel_geography::types::GeogPoint;
+use dotenv::dotenv;
+use std::env;
 use std::sync::{Arc, Mutex};
 
 mod dto {
@@ -97,9 +98,7 @@ fn healthy() -> HttpResponse {
 
 async fn angular_index() -> actix_web::Result<actix_files::NamedFile> {
     info!(APP_LOGGING, "Redirected to Angular SPA");
-    let file = actix_files::NamedFile::open(
-        "../angular-frontend/dist/index.html",
-    )?;
+    let file = actix_files::NamedFile::open("../angular-frontend/dist/index.html")?;
     Ok(file.set_content_type("text/html; charset=UTF-8".parse().unwrap()))
 }
 
@@ -184,9 +183,10 @@ async fn update_shop(
 
 pub async fn dispatch_server() {
     // Set up logging
-    let bind = env::var("ACTIX_WEB_BIND").expect("DACTIX_WEB_BINDATABASE_URL must be set");
+    dotenv().ok();
+    let bind = env::var("BIND").expect("ACTIX_WEB_BIND must be set");
     info!(APP_LOGGING, "Start listening to REST endpoints on {}", bind);
-    std::env::set_var("RUST_LOG", "actix_web=debug");
+    env::set_var("RUST_LOG", "actix_web=debug");
     env_logger::init();
     let conn_mtx = Arc::new(Mutex::new(establish_db_connection()));
 
@@ -196,7 +196,10 @@ pub async fn dispatch_server() {
             .app_data(web::Data::new(conn_mtx.clone()))
             .data(web::JsonConfig::default().limit(4096))
             .wrap(middleware::Logger::default())
-            .service(actix_files::Files::new("/static", "../angular-frontend/dist"))
+            .service(actix_files::Files::new(
+                "/static",
+                "../angular-frontend/dist",
+            ))
             .default_service(
                 web::resource("").route(web::get().to(angular_index)).route(
                     web::route()
