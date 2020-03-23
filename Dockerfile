@@ -45,4 +45,4 @@ RUN ~/.cargo/bin/cargo build
 
 # Ready to run
 CMD ~/.cargo/bin/diesel migration run && \
-    ~/.cargo/bin/cargo run
+    ~/.cargo/bin/cargo run --bin open_street_map_backend
