@@ -35,7 +35,7 @@ COPY rust-backend/src ./rust-backend/src
 # Compile frontend
 WORKDIR /home/app/angular-frontend
 RUN yes n | npm i
-RUN ng build --deploy-url /static/ --output-path dist/
+RUN ng build --prod --deploy-url /static/ --output-path dist/
 
 # Compile backend
 WORKDIR /home/app/rust-backend
