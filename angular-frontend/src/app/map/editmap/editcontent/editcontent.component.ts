@@ -45,6 +45,10 @@ export class EditContentComponent implements OnInit {
     this.addShop = addShop;
   }
 
+  setUpdateShopCallback(updateShop: (Shop) => void) {
+    this.updateShop = updateShop;
+  }
+
   setCloseCallback(close: () => void) {
     this.close = close;
   }
@@ -64,7 +68,7 @@ export class EditContentComponent implements OnInit {
       let request: Observable<Shop>;
       let msg: string;
       if (this.shop != null) {
-        const url = this.normalizeUrl(this.url().value);
+        this.shop.url = this.normalizeUrl(this.url().value);
         request = this.locationService.updateShops(this.shop);
         msg = "geupdated";
       } else {

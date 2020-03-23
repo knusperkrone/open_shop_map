@@ -45,11 +45,10 @@ export class EditmapComponent extends BaseMapComponent {
     // add click listener clousure
     const me = this;
     this.contentChild.setCloseCallback(() => me.infowindow.close());
-    this.contentChild.setAddShopCallback((shop) => this.cluster.addMarker(me.addShopMarker(shop)));
+    this.contentChild.setAddShopCallback((shop) => me.cluster.addMarker(me.addShopMarker(shop)));
+    this.contentChild.setUpdateShopCallback((shop) => { /* TODO: */ })
     this.map.addListener('click', (event) => me.poiClickListener(event));
-    google.maps.event.addListener(this.infowindow, 'closeclick', () => {
-      this.contentChild.reset();
-    });
+    google.maps.event.addListener(this.infowindow, 'closeclick', () => me.contentChild.reset());
   }
 
   composeMarker(marker: google.maps.Marker, shop: Shop) {
