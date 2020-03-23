@@ -29,11 +29,12 @@ export abstract class BaseMapComponent implements AfterViewInit {
     if (this.lat && this.lng && this.zoom) {
       this.initMap(this.lat, this.lng, this.zoom);
     } else if (navigator.geolocation) {
+      let me = this;
       navigator.geolocation.getCurrentPosition((position) => {
         const latitude = position.coords.latitude;
         const longitude = position.coords.longitude;
         this.initMap(latitude, longitude);
-      }, this.geolocationFallback);
+      }, (e) => me.geolocationFallback(e));
     } else {
       this.geolocationFallback(null);
     }
