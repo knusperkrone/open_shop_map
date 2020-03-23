@@ -1,5 +1,5 @@
 import { AfterViewInit, ViewChild, ElementRef } from '@angular/core';
-import { LocationService } from '../service/location.service';
+import { ShopService } from '../service/location.service';
 import { Shop } from '../models/dto';
 import { MapState } from '../models/state';
 import { Router } from '@angular/router';
@@ -9,7 +9,7 @@ export abstract class BaseMapComponent implements AfterViewInit {
 
   private prevState: MapState;
 
-  constructor(protected locationService: LocationService, private router: Router) {
+  constructor(protected locationService: ShopService, private router: Router) {
     // Get previous mapState
     if (this.router?.getCurrentNavigation()?.extras.state) {
       this.prevState = this.router?.getCurrentNavigation()?.extras.state as MapState;
@@ -71,7 +71,7 @@ export abstract class BaseMapComponent implements AfterViewInit {
   fetchShops() {
     const me = this;
 
-    this.locationService.getLocations(this.map.getCenter(), this.map.getBounds()).subscribe((resp) => {
+    this.locationService.getShops(this.map.getCenter(), this.map.getBounds()).subscribe((resp) => {
       var markers = resp.items.map((shop) => me.addShopMarker(shop));
 
       // Add a marker clusterer to manage the markers.

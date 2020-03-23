@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Shop } from 'src/app/models/dto';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { LocationService } from 'src/app/service/location.service';
+import { ShopService } from 'src/app/service/location.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
@@ -21,7 +21,7 @@ export class EditContentComponent implements OnInit {
   private addShop: (Shop) => void;
   private updateShop: (Shop) => void;
 
-  constructor(private locationService: LocationService, private snackBar: MatSnackBar) { }
+  constructor(private locationService: ShopService, private snackBar: MatSnackBar) { }
 
   ngOnInit(): void {
     this.insertGroup = new FormGroup({
@@ -65,12 +65,12 @@ export class EditContentComponent implements OnInit {
       let msg: string;
       if (this.shop != null) {
         const url = this.normalizeUrl(this.url().value);
-        request = this.locationService.updateLocation(this.shop);
+        request = this.locationService.updateShops(this.shop);
         msg = "geupdated";
       } else {
         const geometry: google.maps.LatLng = this.place.geometry.location;
         const url = this.normalizeUrl(this.url().value);
-        request = this.locationService.insertLocation(geometry.lng(), geometry.lat(), this.place.name, url, "")
+        request = this.locationService.insertShops(geometry.lng(), geometry.lat(), this.place.name, url, "")
         msg = "eingtragen";
       }
 

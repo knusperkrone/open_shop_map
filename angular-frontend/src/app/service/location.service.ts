@@ -2,21 +2,20 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ShopResponse, InsertShopReq, Shop } from '../models/dto';
+import { ApiConfig } from './config';
 
 
 @Injectable({
   providedIn: 'root'
 })
-export class LocationService {
-  readonly BASE_URL = "/";
-  readonly RANGE_M = 20_000;
+export class ShopService {
 
   private cachedArea: google.maps.LatLngBounds;
 
   constructor(private http: HttpClient) { }
 
-  getLocations(center: google.maps.LatLng, bounds: google.maps.LatLngBounds): Observable<ShopResponse> {
-    let range = this.RANGE_M;
+  getShops(center: google.maps.LatLng, bounds: google.maps.LatLngBounds): Observable<ShopResponse> {
+    let range = ApiConfig.RANGE_M;
     if (bounds) {
       // determine zoom level and increase range
       let ne = bounds.getNorthEast();
@@ -25,7 +24,7 @@ export class LocationService {
       range += range / 5 * 3; // increase search area
 
       range = Math.trunc(range);
-      range = Math.max(range, this.RANGE_M);
+      range = Math.max(range, ApiConfig.RANGE_M);
     }
 
 
@@ -36,10 +35,10 @@ export class LocationService {
     //const nw = google.maps.geometry.spherical.computeOffset(sw, range, 0);
     this.cachedArea = new google.maps.LatLngBounds(sw, ne)
 
-    return this.http.get(`${this.BASE_URL}api/shop?lon=${center.lng()}&lat=${center.lat()}&range=${range.toFixed(0)}`) as Observable<ShopResponse>;
+    return this.http.get(`${ApiConfig.BASE_URL}api/shop?lon=${center.lng()}&lat=${center.lat()}&range=${range.toFixed(0)}`) as Observable<ShopResponse>;
   }
 
-  insertLocation(lon: number, lat: number, title: string, url: string, descr: string) {
+  insertShops(lon: number, lat: number, title: string, url: string, descr: string) {
     const req: InsertShopReq = {
       lon: lon,
       lat: lat,
@@ -47,10 +46,10 @@ export class LocationService {
       url: url,
       descr: descr,
     };
-    return this.http.post(`${this.BASE_URL}api/shop`, req) as Observable<Shop>;
+    return this.http.post(`${ApiConfig.BASE_URL}api/shop`, req) as Observable<Shop>;
   }
 
-  updateLocation(shop: Shop) {
+  updateShops(shop: Shop) {
     const req: InsertShopReq = {
       lon: shop.lon,
       lat: shop.lat,
@@ -58,7 +57,7 @@ export class LocationService {
       url: shop.url,
       descr: shop.descr,
     };
-    return this.http.put(`${this.BASE_URL}api/shop`, req) as Observable<Shop>;
+    return this.http.put(`${ApiConfig.BASE_URL}api/shop`, req) as Observable<Shop>;
   }
 
   updatedViewArea(area: google.maps.LatLngBounds): boolean {

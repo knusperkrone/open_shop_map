@@ -1,5 +1,5 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
-import { LocationService } from '../../service/location.service';
+import { ShopService } from '../../service/location.service';
 import { PlacesService } from '../../service/places.service';
 //import { NewContentComponent } from './newcontent/newcontent.component';
 import { BaseMapComponent } from '../basemap.compontent';
@@ -13,7 +13,7 @@ import { EditContentComponent } from './editcontent/editcontent.component';
   styleUrls: ['./editmap.component.scss']
 })
 export class EditmapComponent extends BaseMapComponent {
-  constructor(locationService: LocationService, router: Router, private placeService: PlacesService) {
+  constructor(locationService: ShopService, router: Router, private placeService: PlacesService) {
     super(locationService, router);
   }
 

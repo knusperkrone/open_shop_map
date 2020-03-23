@@ -1,5 +1,5 @@
 import { Component, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
-import { LocationService } from '../../service/location.service';
+import { ShopService } from '../../service/location.service';
 import { Shop } from '../../models/dto';
 import { BaseMapComponent } from '../basemap.compontent';
 import { ShowContentComponent } from './showcontent/showcontent.component';
@@ -17,7 +17,7 @@ export class ShowMapComponent extends BaseMapComponent {
   @ViewChild('infoContent', { static: false }) contentChild: ShowContentComponent;
   infowindow: google.maps.InfoWindow;
 
-  constructor(locationService: LocationService, router: Router) {
+  constructor(locationService: ShopService, router: Router) {
     super(locationService, router);
   }
 

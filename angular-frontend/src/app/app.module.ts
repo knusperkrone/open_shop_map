@@ -12,7 +12,7 @@ import { ShowContentComponent } from './map/showmap/showcontent/showcontent.comp
 import { EditmapComponent } from './map/editmap/editmap.component';
 import { EditContentComponent } from './map/editmap/editcontent/editcontent.component';
 import { PlacesService } from './service/places.service';
-import { LocationService } from './service/location.service';
+import { ShopService } from './service/location.service';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
@@ -46,7 +46,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
     MatSnackBarModule,
     MatToolbarModule,
   ],
-  providers: [PlacesService, LocationService],
+  providers: [PlacesService, ShopService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
