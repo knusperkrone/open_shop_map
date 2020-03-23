@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ShopResponse, InsertShopReq, Shop } from '../models/dto';
-import { ApiConfig } from './config';
+import { environment } from '../../environments/environment';
 
 
 @Injectable({
@@ -15,7 +15,7 @@ export class ShopService {
   constructor(private http: HttpClient) { }
 
   getShops(center: google.maps.LatLng, bounds: google.maps.LatLngBounds): Observable<ShopResponse> {
-    let range = ApiConfig.RANGE_M;
+    let range = environment.defaultRange;
     if (bounds) {
       // determine zoom level and increase range
       let ne = bounds.getNorthEast();
@@ -24,7 +24,7 @@ export class ShopService {
       range += range / 5 * 3; // increase search area
 
       range = Math.trunc(range);
-      range = Math.max(range, ApiConfig.RANGE_M);
+      range = Math.max(range, environment.defaultRange);
     }
 
 
@@ -35,7 +35,7 @@ export class ShopService {
     //const nw = google.maps.geometry.spherical.computeOffset(sw, range, 0);
     this.cachedArea = new google.maps.LatLngBounds(sw, ne)
 
-    return this.http.get(`${ApiConfig.BASE_URL}api/shop?lon=${center.lng()}&lat=${center.lat()}&range=${range.toFixed(0)}`) as Observable<ShopResponse>;
+    return this.http.get(`${environment.baseUrl}api/shop?lon=${center.lng()}&lat=${center.lat()}&range=${range.toFixed(0)}`) as Observable<ShopResponse>;
   }
 
   insertShops(lon: number, lat: number, title: string, url: string, descr: string) {
@@ -46,7 +46,7 @@ export class ShopService {
       url: url,
       descr: descr,
     };
-    return this.http.post(`${ApiConfig.BASE_URL}api/shop`, req) as Observable<Shop>;
+    return this.http.post(`${environment.baseUrl}api/shop`, req) as Observable<Shop>;
   }
 
   updateShops(shop: Shop) {
@@ -57,7 +57,7 @@ export class ShopService {
       url: shop.url,
       descr: shop.descr,
     };
-    return this.http.put(`${ApiConfig.BASE_URL}api/shop`, req) as Observable<Shop>;
+    return this.http.put(`${environment.baseUrl}api/shop`, req) as Observable<Shop>;
   }
 
   updatedViewArea(area: google.maps.LatLngBounds): boolean {
