@@ -8,7 +8,11 @@ use actix_web::{guard, middleware, web, App, HttpResponse, HttpServer};
 use diesel::PgConnection;
 use diesel_geography::types::GeogPoint;
 use dotenv::dotenv;
+use rustls::internal::pemfile::{certs, rsa_private_keys};
+use rustls::{NoClientAuth, ServerConfig};
 use std::env;
+use std::fs::File;
+use std::io::BufReader;
 use std::sync::{Arc, Mutex};
 
 mod dto {
@@ -189,6 +193,21 @@ pub async fn dispatch_server() {
     env::set_var("RUST_LOG", "actix_web=debug");
     env_logger::init();
     let conn_mtx = Arc::new(Mutex::new(establish_db_connection()));
+
+    // load ssl keys
+    let mut config = ServerConfig::new(NoClientAuth::new());
+    let cert_file_opt = File::open("certs/cert.pem");
+    let key_file_opt = File::open("certs/key.pem");
+    if cert_file_opt.is_ok() && key_file_opt.is_ok() {
+        info!(APP_LOGGING, "Activating tls");
+        let cert_file = &mut BufReader::new(cert_file_opt.unwrap());
+        let key_file = &mut BufReader::new(key_file_opt.unwrap());
+        let cert_chain = certs(cert_file).unwrap();
+        let mut keys = rsa_private_keys(key_file).unwrap();
+        config.set_single_cert(cert_chain, keys.remove(0)).unwrap();
+    } else {
+        info!(APP_LOGGING, "No tls config found");
+    }
 
     HttpServer::new(move || {
         App::new()
