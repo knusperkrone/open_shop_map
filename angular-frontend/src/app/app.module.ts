@@ -12,7 +12,7 @@ import { MapComponent } from "./map/map.component";
 import { ShowContentComponent } from './map/showcontent/showcontent.component';
 import { EditContentComponent } from './map/editcontent/editcontent.component';
 import { PlacesService } from './service/places.service';
-import { ShopService } from './service/location.service';
+import { ShopService } from './service/shop.service';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';

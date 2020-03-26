@@ -98,7 +98,7 @@ export class EditMapDecorator implements MapDecorator {
       this.componentRef = componentRef;
       this.parent.infowindow.setContent(this.componentRef.location.nativeElement);
 
-      this.componentRef.instance.locationService = this.parent.locationService;
+      this.componentRef.instance.shopService = this.parent.shopService;
       this.componentRef.instance.snackBar = this.parent.snackBar;
       this.componentRef.instance.setCloseCallback(() => this.parent.infowindow.close());
       this.componentRef.instance.setAddShopCallback((shop) => this.parent.cluster.addMarker(this.parent.addShopMarker(shop)));

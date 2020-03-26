@@ -1,5 +1,5 @@
 import { Component, ViewChild, ElementRef, AfterViewInit, ComponentFactoryResolver, ViewContainerRef, Renderer2, OnInit } from '@angular/core';
-import { ShopService } from '../service/location.service';
+import { ShopService } from '../service/shop.service';
 import { Shop } from '../models/dto';
 import { Router } from '@angular/router';
 import { ClickContentComponent } from './clickcontent/clickcontent.component';
@@ -30,7 +30,7 @@ export class MapComponent implements AfterViewInit, OnInit {
   private overlay: google.maps.OverlayView;
   private isEditing = false;
 
-  constructor(public locationService: ShopService, public router: Router, public snackBar: MatSnackBar, public placeService: PlacesService, public componentFactoryResolver: ComponentFactoryResolver, public renderer: Renderer2) { }
+  constructor(public shopService: ShopService, public router: Router, public snackBar: MatSnackBar, public placeService: PlacesService, public componentFactoryResolver: ComponentFactoryResolver, public renderer: Renderer2) { }
 
   ngOnInit(): void {
     this.decorator = new ShowMapDecorator(this);
@@ -71,7 +71,7 @@ export class MapComponent implements AfterViewInit, OnInit {
 
     const me = this;
     google.maps.event.addListener(this.map, 'idle', () => {
-      if (me.locationService.updatedViewArea(me.map.getBounds())) {
+      if (me.shopService.updatedViewArea(me.map.getBounds())) {
         me.fetchShops();
       }
     });
@@ -86,7 +86,7 @@ export class MapComponent implements AfterViewInit, OnInit {
   fetchShops() {
     const me = this;
 
-    this.locationService.getShops(this.map.getCenter(), this.map.getBounds()).subscribe((resp) => {
+    this.shopService.getShops(this.map.getCenter(), this.map.getBounds()).subscribe((resp) => {
       var markers = resp.items.map((shop) => me.addShopMarker(shop));
 
       // Add a marker clusterer to manage the markers.
