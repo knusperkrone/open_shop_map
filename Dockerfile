@@ -40,9 +40,11 @@ RUN ~/.cargo/bin/cargo build
 WORKDIR /home/app/
 COPY angular-frontend/*.js ./angular-frontend/
 COPY angular-frontend/*.json ./angular-frontend/
-COPY angular-frontend/src ./angular-frontend/src
 WORKDIR /home/app/angular-frontend
 RUN yes n | npm i
+WORKDIR /home/app/
+COPY angular-frontend/src ./angular-frontend/src
+WORKDIR /home/app/angular-frontend
 RUN ng build --prod --deploy-url /static/ --output-path dist/
 
 # Ready to run
