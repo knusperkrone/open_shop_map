@@ -1,7 +1,10 @@
 .title {
   overflow: hidden;
+  display: inline-block;
   font-weight: bold;
   font-size: large;
+  max-lines: 2;
+  margin-bottom: 8px;
 }
 
 .padding-bottom {
@@ -12,10 +15,24 @@
   display: block;
 }
 
-span {
-  font-size: large;
+.button-link mat-icon {
+  float: left;
+  margin-top: 8px;
 }
 
-span a {
+.button-link span {
   font-weight: bold;
+}
+
+.mat-store {
+  width: 100%;
+  background-color: #CE4C67;
+  color: white;
+}
+
+.mat-donate {
+  width: 100%;
+  margin-top: 5px;
+  background-color: #389586;
+  color: white;
 }

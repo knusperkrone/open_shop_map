@@ -101,10 +101,18 @@ export class MapComponent implements AfterViewInit, OnInit {
   }
 
   addShopMarker(shop: Shop): google.maps.Marker {
+    let icon: string;
+    if (shop.donationUrl && shop.url) {
+      icon = 'assets/store_icon.png'
+    } else if (shop.donationUrl) {
+      icon = 'assets/donate_icon.png'
+    } else {
+      icon = 'assets/shop_icon.png'
+    }
     const marker = new google.maps.Marker({
       position: new google.maps.LatLng(shop.lat, shop.lon),
-      label: shop.title,
       clickable: true,
+      icon: icon,
     });
     (marker as any).__shop = shop;
     this.decorator.composeMarker(marker, shop);

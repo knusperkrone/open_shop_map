@@ -38,12 +38,13 @@ export class ShopService {
     return this.http.get(`${environment.baseUrl}api/shop?lon=${center.lng()}&lat=${center.lat()}&range=${range.toFixed(0)}`) as Observable<ShopResponse>;
   }
 
-  insertShops(lon: number, lat: number, title: string, url: string, descr: string) {
+  insertShops(lon: number, lat: number, title: string, url: string, donateUrl: string, descr: string) {
     const req: InsertShopReq = {
       lon: lon,
       lat: lat,
       title: title,
       url: url,
+      donateUrl: donateUrl,
       descr: descr,
     };
     return this.http.post(`${environment.baseUrl}api/shop`, req) as Observable<Shop>;

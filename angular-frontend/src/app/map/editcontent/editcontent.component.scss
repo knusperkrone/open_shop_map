@@ -2,6 +2,9 @@
   overflow: hidden;
   font-weight: bold;
   font-size: large;
+  display: inline-block;
+  max-lines: 2;
+  margin-bottom: 8px;
 }
 
 .padding-bottom {

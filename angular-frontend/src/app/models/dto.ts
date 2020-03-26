@@ -9,6 +9,7 @@ export interface ErrorMsg {
 export interface Shop {
   title: string;
   url: string;
+  donationUrl: string;
   descr: string;
   lon: number;
   lat: number;
@@ -21,6 +22,7 @@ export interface ShopResponse {
 export interface InsertShopReq {
   title: string;
   url: string;
+  donateUrl: string,
   descr: string;
   lon: number;
   lat: number;

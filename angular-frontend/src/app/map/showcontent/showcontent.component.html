@@ -1,3 +1,16 @@
-<span id="place-name" class="title"></span>
+<span class="title">{{shop.title}}</span>
 <mat-divider class="padding-bottom"> </mat-divider>
-<span>Shop: <a href="{{getLink()}}">{{getLink()}}</a></span>
+<div *ngIf="shop.url">
+<a class="button-link" href="{{shop.url}}">
+  <button mat-flat-button color="store">
+    <mat-icon>storefront</mat-icon><span>Zum Shop</span>
+  </button>
+</a>
+</div>
+<div *ngIf="shop.donateUrl">
+  <a class="button-link" href="{{shop.donateUrl}}">
+    <button mat-flat-button color="donate">
+      <mat-icon>money</mat-icon><span>Spenden</span>
+    </button>
+  </a>
+</div>

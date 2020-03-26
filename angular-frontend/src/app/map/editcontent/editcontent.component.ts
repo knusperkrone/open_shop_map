@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Shop } from 'src/app/models/dto';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { FormGroup, FormControl, Validators, ValidatorFn } from '@angular/forms';
 import { ShopService } from 'src/app/service/shop.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
@@ -26,20 +26,21 @@ export class EditContentComponent implements OnInit {
 
   ngOnInit(): void {
     this.insertGroup = new FormGroup({
-      'url': new FormControl(this.shop?.url, [Validators.required]),
-      'coupon': new FormControl(false),
-    });
+      'url': new FormControl(this.shop?.url),
+      'donationUrl': new FormControl(this.shop?.donationUrl),
+    }, this.validateForm());
   }
 
   url() {
     return this.insertGroup?.get('url');
   }
 
+  donateUrl() {
+    return this.insertGroup?.get('donateUrl');
+  }
+
   getErrorMessage() {
-    if (this.url().hasError('required')) {
-      return 'Die Shop URL fehlt noch!';
-    }
-    return '';
+    return 'Eine Url muss eingetragen werden';
   }
 
   setAddShopCallback(addShop: (Shop) => void) {
@@ -70,12 +71,14 @@ export class EditContentComponent implements OnInit {
       let msg: string;
       if (this.shop != null) {
         this.shop.url = this.normalizeUrl(this.url().value);
+        this.shop.donationUrl = this.normalizeUrl(this.donateUrl().value);
         request = this.shopService.updateShops(this.shop);
         msg = 'geupdated';
       } else {
         const geometry: google.maps.LatLng = this.place.geometry.location;
         const url = this.normalizeUrl(this.url().value);
-        request = this.shopService.insertShops(geometry.lng(), geometry.lat(), this.place.name, url, '')
+        const donateUrl = this.normalizeUrl(this.donateUrl().value);
+        request = this.shopService.insertShops(geometry.lng(), geometry.lat(), this.place.name, url, donateUrl, '');
         msg = 'eingtragen';
       }
 
@@ -120,8 +123,27 @@ export class EditContentComponent implements OnInit {
     this.url()?.setValue(shop.url);
   }
 
+  private validateForm(): ValidatorFn {
+    return (control) => {
+      if (!this.url() && !this.donateUrl()) {
+        // not inited
+        return { inited: true };
+      }
+
+      if (!this.url().value && !this.donateUrl().value) {
+        this.url().setErrors({ required: true });
+        this.donateUrl().setErrors({ required: true });
+        return { required: true };
+      }
+      this.url().setErrors(null);
+      this.donateUrl().setErrors(null);
+    }
+  }
+
   private normalizeUrl(url: string): string {
-    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    if (!url) {
+      return null
+    } else if (!url.startsWith('http://') && !url.startsWith('https://')) {
       return 'http://' + url;
     }
     return url;

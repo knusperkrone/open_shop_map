@@ -8,19 +8,16 @@ import { Shop } from 'src/app/models/dto';
 })
 export class ShowContentComponent {
 
-  private shop: Shop;
+  shop: Shop;
 
   constructor() { }
 
-  getLink(): string {
-    if (this.shop) {
-      return this.shop.url;
-    }
+  shopLink(): string {
+    return this.shop?.url;
   }
 
   setShop(shop: Shop) {
     this.shop = shop;
-    document.getElementById('place-name').textContent = shop.title;
   }
 
 }

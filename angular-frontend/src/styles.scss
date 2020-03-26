@@ -105,6 +105,11 @@ $md-ifwarn: (
     )
 );
 
+$store-color: #CE4C67;
+$donate-color: #389586;
+$store-donate-color: #D77A48;
+
+
 $if-app-primary: mat-palette($md-iforange);
 $if-app-accent:  mat-palette($md-ifaccent, 300, 100, 400);
 $if-app-warn:    mat-palette($md-ifwarn, A400);

@@ -1,10 +1,16 @@
 <span class="title">{{title}}</span>
-<mat-divider class="padding-bottom"> </mat-divider>
+<mat-divider class="padding-bottom"></mat-divider>
 <div [formGroup]="insertGroup">
   <div class="padding-bottom">
     <mat-form-field appearance="fill">
       <mat-label>Shop Url</mat-label>
       <input matInput formControlName="url">
+    </mat-form-field>
+  </div>
+  <div class="padding-bottom">
+    <mat-form-field appearance="fill">
+      <mat-label>Spenden Url</mat-label>
+      <input matInput formControlName="donationUrl">
       <mat-error>{{getErrorMessage()}}</mat-error>
     </mat-form-field>
   </div>
