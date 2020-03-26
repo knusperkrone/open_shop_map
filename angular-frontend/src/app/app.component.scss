@@ -3,8 +3,17 @@ mat-toolbar{
   max-height:64px
  }
 
+a {
+  text-decoration: none;
+}
+
 .icon {
   padding: 0 14px;
+  padding-top: 5px;
+  color: white;
+}
+
+.banner {
   color: white;
 }
 

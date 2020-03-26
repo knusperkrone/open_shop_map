@@ -50,6 +50,8 @@ export abstract class BaseMapComponent implements AfterViewInit {
       zoom: zoom,
       streetViewControl: false,
       fullscreenControl: false,
+      zoomControl: false,
+      mapTypeControl: false,
       styles: this.getMapStyles()
     };
 
