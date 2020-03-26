@@ -8,10 +8,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AboutComponent } from './about/about.component';
-import { ShowMapComponent } from "./map/showmap/showmap.component";
-import { ShowContentComponent } from './map/showmap/showcontent/showcontent.component';
-import { EditmapComponent } from './map/editmap/editmap.component';
-import { EditContentComponent } from './map/editmap/editcontent/editcontent.component';
+import { MapComponent } from "./map/map.component";
+import { ShowContentComponent } from './map/showcontent/showcontent.component';
+import { EditContentComponent } from './map/editcontent/editcontent.component';
 import { PlacesService } from './service/places.service';
 import { ShopService } from './service/location.service';
 
@@ -30,9 +29,8 @@ import { ClickContentComponent } from './map/clickcontent/clickcontent.component
 @NgModule({
   declarations: [
     AppComponent,
-    ShowMapComponent,
+    MapComponent,
     ShowContentComponent,
-    EditmapComponent,
     EditContentComponent,
     ClickContentComponent,
     AboutComponent,

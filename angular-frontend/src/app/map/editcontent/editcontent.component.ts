@@ -16,22 +16,23 @@ export class EditContentComponent implements OnInit {
 
   place: any;
   shop: Shop;
+  title: string;
   // Callbacks
   private close: () => void;
   private addShop: (Shop) => void;
   private updateShop: (Shop) => void;
 
-  constructor(private locationService: ShopService, private snackBar: MatSnackBar) { }
+  constructor(public locationService: ShopService, public snackBar: MatSnackBar) { }
 
   ngOnInit(): void {
     this.insertGroup = new FormGroup({
-      'url': new FormControl(null, [Validators.required]),
+      'url': new FormControl(this.shop?.url, [Validators.required]),
       'coupon': new FormControl(false),
     });
   }
 
   url() {
-    return this.insertGroup.get('url');
+    return this.insertGroup?.get('url');
   }
 
   getErrorMessage() {
@@ -56,7 +57,7 @@ export class EditContentComponent implements OnInit {
   reset() {
     this.place = null;
     this.shop = null;
-    this.insertGroup.reset();
+    this.insertGroup?.reset();
   }
 
   abort() {
@@ -70,12 +71,12 @@ export class EditContentComponent implements OnInit {
       if (this.shop != null) {
         this.shop.url = this.normalizeUrl(this.url().value);
         request = this.locationService.updateShops(this.shop);
-        msg = "geupdated";
+        msg = 'geupdated';
       } else {
         const geometry: google.maps.LatLng = this.place.geometry.location;
         const url = this.normalizeUrl(this.url().value);
-        request = this.locationService.insertShops(geometry.lng(), geometry.lat(), this.place.name, url, "")
-        msg = "eingtragen";
+        request = this.locationService.insertShops(geometry.lng(), geometry.lat(), this.place.name, url, '')
+        msg = 'eingtragen';
       }
 
       request.subscribe(
@@ -86,14 +87,14 @@ export class EditContentComponent implements OnInit {
             this.updateShop(shop);
           }
           this.insertGroup.reset();
-          this.snackBar.open(`Dein Shop wurde ${msg} - Danke!`, "Ok", {
+          this.snackBar.open(`Dein Shop wurde ${msg} - Danke!`, 'Ok', {
             duration: 2000,
           });
           this.close();
         },
         (msg) => {
           let err = msg?.error?.msg ?? JSON.stringify(msg);
-          this.snackBar.open("Da ist was schiefgelaufen: " + err, "Ok", {
+          this.snackBar.open('Da ist was schiefgelaufen: ' + err, 'Ok', {
             duration: 8000,
           });
         }
@@ -106,7 +107,7 @@ export class EditContentComponent implements OnInit {
     this.shop = null;
     this.place = place;
 
-    document.getElementById('place-name').textContent = place.name;
+    this.title = place.name;
   }
 
 
@@ -115,13 +116,13 @@ export class EditContentComponent implements OnInit {
     this.place = null;
     this.shop = shop;
 
-    document.getElementById('place-name').textContent = shop.title;
-    this.url().setValue(shop.url);
+    this.title = shop.title;
+    this.url()?.setValue(shop.url);
   }
 
   private normalizeUrl(url: string): string {
-    if (!url.startsWith("http://") && !url.startsWith("https://")) {
-      return "http://" + url;
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      return 'http://' + url;
     }
     return url;
   }

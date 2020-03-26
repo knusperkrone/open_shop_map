@@ -1,0 +1,11 @@
+<div #mapContainer id="map"></div>
+
+<div #infoContainer class="infowindow-content">
+  <ng-template #infoContent></ng-template>
+</div>
+
+<ng-template #clickContent class="infowindow-content"></ng-template>
+
+<div class="fab-container">
+  <button mat-fab color="accent" (click)="switchMode()">Edit</button>
+</div>
