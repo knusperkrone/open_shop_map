@@ -38,14 +38,13 @@ export class ShopService {
     return this.http.get(`${environment.baseUrl}api/shop?lon=${center.lng()}&lat=${center.lat()}&range=${range.toFixed(0)}`) as Observable<ShopResponse>;
   }
 
-  insertShops(lon: number, lat: number, title: string, url: string, donateUrl: string, descr: string) {
+  insertShops(lon: number, lat: number, title: string, url: string, donationUrl: string) {
     const req: InsertShopReq = {
       lon: lon,
       lat: lat,
       title: title,
       url: url,
-      donateUrl: donateUrl,
-      descr: descr,
+      donationUrl: donationUrl,
     };
     return this.http.post(`${environment.baseUrl}api/shop`, req) as Observable<Shop>;
   }
@@ -56,7 +55,7 @@ export class ShopService {
       lat: shop.lat,
       title: shop.title,
       url: shop.url,
-      descr: shop.descr,
+      donationUrl: shop.donationUrl,
     };
     return this.http.put(`${environment.baseUrl}api/shop`, req) as Observable<Shop>;
   }

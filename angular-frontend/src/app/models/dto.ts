@@ -22,8 +22,7 @@ export interface ShopResponse {
 export interface InsertShopReq {
   title: string;
   url: string;
-  donateUrl: string,
-  descr: string;
+  donationUrl: string,
   lon: number;
   lat: number;
 }

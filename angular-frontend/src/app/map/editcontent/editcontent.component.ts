@@ -35,8 +35,8 @@ export class EditContentComponent implements OnInit {
     return this.insertGroup?.get('url');
   }
 
-  donateUrl() {
-    return this.insertGroup?.get('donateUrl');
+  donationUrl() {
+    return this.insertGroup?.get('donationUrl');
   }
 
   getErrorMessage() {
@@ -66,19 +66,19 @@ export class EditContentComponent implements OnInit {
   }
 
   submit() {
-    if (this.insertGroup.touched && this.insertGroup.valid) {
+    if (this.insertGroup.valid) {
       let request: Observable<Shop>;
       let msg: string;
       if (this.shop != null) {
         this.shop.url = this.normalizeUrl(this.url().value);
-        this.shop.donationUrl = this.normalizeUrl(this.donateUrl().value);
+        this.shop.donationUrl = this.normalizeUrl(this.donationUrl().value);
         request = this.shopService.updateShops(this.shop);
         msg = 'geupdated';
       } else {
         const geometry: google.maps.LatLng = this.place.geometry.location;
-        const url = this.normalizeUrl(this.url().value);
-        const donateUrl = this.normalizeUrl(this.donateUrl().value);
-        request = this.shopService.insertShops(geometry.lng(), geometry.lat(), this.place.name, url, donateUrl, '');
+        const url = this.normalizeUrl(this.url()?.value);
+        const donationUrl = this.normalizeUrl(this.donationUrl()?.value);
+        request = this.shopService.insertShops(geometry.lng(), geometry.lat(), this.place.name, url, donationUrl);
         msg = 'eingtragen';
       }
 
@@ -125,18 +125,19 @@ export class EditContentComponent implements OnInit {
 
   private validateForm(): ValidatorFn {
     return (control) => {
-      if (!this.url() && !this.donateUrl()) {
+      if (this.url() == null || this.donationUrl() == null) {
         // not inited
-        return { inited: true };
+        return;
       }
 
-      if (!this.url().value && !this.donateUrl().value) {
-        this.url().setErrors({ required: true });
-        this.donateUrl().setErrors({ required: true });
-        return { required: true };
+      if (!this.url().value && !this.donationUrl().value) {
+        this.url().setErrors({ requiredUrl: true });
+        this.donationUrl().setErrors({ requiredDonate: true });
+      } else {
+        this.url().setErrors(null);
+        this.donationUrl().setErrors(null);
       }
-      this.url().setErrors(null);
-      this.donateUrl().setErrors(null);
+      return null;
     }
   }
 
