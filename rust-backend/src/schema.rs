@@ -5,8 +5,8 @@ table! {
     shops (id) {
         id -> Int4,
         title -> Varchar,
-        url -> Varchar,
-        descr -> Text,
+        url -> Nullable<Varchar>,
+        donation_url -> Nullable<Varchar>,
         location -> Geography,
         last_edited -> Timestamp,
     }

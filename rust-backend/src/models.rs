@@ -17,8 +17,8 @@ use std::string::String;
 pub struct Shop {
     pub id: i32,
     pub title: String,
-    pub url: String,
-    pub descr: String,
+    pub url: Option<String>,
+    pub donation_url: Option<String>,
     pub location: GeogPoint,
     pub last_edited: NaiveDateTime,
 }
@@ -27,8 +27,8 @@ pub struct Shop {
 #[table_name = "shops"]
 pub struct NewShop {
     pub title: String,
-    pub url: String,
-    pub descr: String,
+    pub url: Option<String>,
+    pub donation_url: Option<String>,
     pub location: GeogPoint,
 }
 
@@ -66,7 +66,7 @@ pub fn update_shop(conn: &PgConnection, new_shop: NewShop) -> Result<Shop, DBErr
     let dao: Shop = diesel::update(shops)
         .filter(location.eq(new_shop.location))
         .filter(title.eq(new_shop.title))
-        .set((url.eq(new_shop.url), descr.eq(new_shop.descr)))
+        .set(url.eq(new_shop.url))
         .get_result(conn)?;
 
     Ok(dao)
@@ -86,11 +86,11 @@ mod test {
         let conn = establish_db_connection();
         let shop = NewShop {
             title: "Test Shop".to_owned(),
-            url: "http://www.interface-ag.de".to_owned(),
-            descr: "best shop in town".to_owned(),
+            url: Some("http://www.interface-ag.de".to_owned()),
+            donation_url: None,
             location: GeogPoint {
                 x: 11.0788608,
-                y: 49.456742399999996,
+                y: 49.456742399999,
                 srid: None,
             },
         };
@@ -104,8 +104,8 @@ mod test {
         let conn = establish_db_connection();
         let mut shop = NewShop {
             title: "Test Shop".to_owned(),
-            url: "http://www.interface-ag.de".to_owned(),
-            descr: "best shop in town".to_owned(),
+            url: Some("http://www.interface-ag.de".to_owned()),
+            donation_url: None,
             location: GeogPoint {
                 x: 11.0788608,
                 y: 49.456742399999996,
@@ -115,9 +115,9 @@ mod test {
         
         let _ = insert_new_shop(&conn, &shop);
 
-        shop.url = "http://www.if-lab.de".to_owned();
+        shop.url = Some("http://www.if-lab.de".to_owned());
         let result = update_shop(&conn, shop).unwrap();
-        assert_eq!(result.url, "http://www.if-lab.de".to_owned());
+        assert_eq!(result.url.unwrap(), "http://www.if-lab.de".to_owned());
     }
 
     #[test]

@@ -15,7 +15,7 @@ use std::fs::File;
 use std::io::BufReader;
 use std::sync::{Arc, Mutex};
 
-mod dto {
+pub mod dto {
     use super::*;
     use serde::{Deserialize, Serialize};
 
@@ -32,8 +32,9 @@ mod dto {
     #[derive(Debug, Serialize, Deserialize)]
     pub struct ShopDto {
         pub title: String,
-        pub url: String,
-        pub descr: String,
+        pub url: Option<String>,
+        #[serde(rename(serialize = "donationUrl"))]
+        pub donation_url: Option<String>,
         pub lon: f64,
         pub lat: f64,
     }
@@ -43,7 +44,7 @@ mod dto {
             ShopDto {
                 title: shop.title,
                 url: shop.url,
-                descr: shop.descr,
+                donation_url: shop.donation_url,
                 lon: shop.location.x,
                 lat: shop.location.y,
             }
@@ -66,8 +67,9 @@ mod dto {
     #[derive(Debug, Serialize, Deserialize)]
     pub struct InsertShopReq {
         pub title: String,
-        pub url: String,
-        pub descr: String,
+        pub url: Option<String>,
+        #[serde(rename(deserialize = "donationUrl"))]
+        pub donation_url: Option<String>,
         pub lon: f64,
         pub lat: f64,
     }
@@ -84,7 +86,7 @@ mod dto {
             models::NewShop {
                 title: self.title,
                 url: self.url,
-                descr: self.descr,
+                donation_url: self.donation_url,
                 location: GeogPoint {
                     x: self.lon,
                     y: self.lat,
@@ -136,8 +138,8 @@ async fn insert_shop(
     data: web::Json<dto::InsertShopReq>,
 ) -> HttpResponse {
     let conn = conn_mtx.lock().unwrap();
-    let url_result = valiator::normalize_url(&data.url).await;
-    if let Err(msg) = url_result {
+    
+    if let Err(msg) = valiator::validate_shop(&data).await {
         warn!(APP_LOGGING, "{}", msg);
         return HttpResponse::BadRequest().json(dto::ErrorResp {
             msg: format!("{}", msg),
@@ -163,8 +165,8 @@ async fn update_shop(
     data: web::Json<dto::InsertShopReq>,
 ) -> HttpResponse {
     let conn = conn_mtx.lock().unwrap();
-    let url_result = valiator::normalize_url(&data.url).await;
-    if let Err(msg) = url_result {
+
+    if let Err(msg) = valiator::validate_shop(&data).await {
         warn!(APP_LOGGING, "{}", msg);
         return HttpResponse::BadRequest().json(dto::ErrorResp {
             msg: format!("{}", msg),
@@ -281,10 +283,10 @@ mod test {
 
         let request_json = dto::InsertShopReq {
             title: "title".to_owned(),
-            url: "http://interface-ag.de".to_owned(),
-            descr: "descr".to_owned(),
+            url: Some("http://interface-ag.de".to_owned()),
+            donation_url: None,
             lon: 11.0788608,
-            lat: 49.456742399999996,
+            lat: 49.456,
         };
 
         let req = test::TestRequest::post()
@@ -319,8 +321,8 @@ mod test {
 
         let mut json = dto::InsertShopReq {
             title: "title".to_owned(),
-            url: "http://interface-ag.de".to_owned(),
-            descr: "descr".to_owned(),
+            url: Some("http://interface-ag.de".to_owned()),
+            donation_url: None,
             lon: 11.0788608,
             lat: 49.456742399999996,
         };
@@ -331,7 +333,7 @@ mod test {
             .to_request();
         let _ = app.call(req).await.unwrap();
 
-        json.url = "http://if-lab.de".to_owned();
+        json.url = Some("http://if-lab.de".to_owned());
         req = test::TestRequest::put()
             .uri("/api/shop")
             .set_json(&json)
