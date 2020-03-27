@@ -11,6 +11,6 @@ mod schema;
 mod valiator;
 
 #[actix_rt::main]
-async fn main() {
-    rest::dispatch_server().await;
+async fn main() -> Result<(), std::io::Error> {
+    rest::dispatch_server().await
 }

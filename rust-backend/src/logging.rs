@@ -1,3 +1,4 @@
+use dotenv::dotenv;
 use once_cell::sync::Lazy;
 use slog::{FnValue, *};
 use sloggers::{
@@ -5,6 +6,7 @@ use sloggers::{
     types::Severity,
     Build,
 };
+use std::env;
 use std::fs::OpenOptions;
 use std::sync::Mutex;
 
@@ -14,7 +16,9 @@ pub static APP_LOGGING: Lazy<slog::Logger> = Lazy::new(|| {
         builder.level(Severity::Debug);
         builder.destination(Destination::Stdout);
     } else {
-        let logfile = "./log/log_app.txt";
+        dotenv().ok();
+        let log_dir = env::var("LOG_DIR").expect("LOG_DIR must be set");
+        let logfile = format!("{}/log_app.txt", log_dir);
         let file = OpenOptions::new()
             .create(true)
             .write(true)

@@ -5,14 +5,13 @@ use crate::valiator;
 use actix_cors::Cors;
 use actix_files;
 use actix_web::{guard, middleware, web, App, HttpResponse, HttpServer};
+use actix_web_middleware_redirect_https::RedirectHTTPS;
 use diesel::PgConnection;
 use diesel_geography::types::GeogPoint;
 use dotenv::dotenv;
-use rustls::internal::pemfile::{certs, rsa_private_keys};
-use rustls::{NoClientAuth, ServerConfig};
+use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 use std::env;
 use std::fs::File;
-use std::io::BufReader;
 use std::sync::{Arc, Mutex};
 
 pub mod dto {
@@ -138,7 +137,6 @@ async fn insert_shop(
     data: web::Json<dto::InsertShopReq>,
 ) -> HttpResponse {
     let conn = conn_mtx.lock().unwrap();
-    
     if let Err(msg) = valiator::validate_shop(&data).await {
         warn!(APP_LOGGING, "{}", msg);
         return HttpResponse::BadRequest().json(dto::ErrorResp {
@@ -187,31 +185,33 @@ async fn update_shop(
     }
 }
 
-pub async fn dispatch_server() {
+pub async fn dispatch_server() -> Result<(), std::io::Error> {
     // Set up logging
     dotenv().ok();
-    let bind = env::var("BIND").expect("ACTIX_WEB_BIND must be set");
-    info!(APP_LOGGING, "Start listening to REST endpoints on {}", bind);
     env::set_var("RUST_LOG", "actix_web=debug");
     env_logger::init();
-    let conn_mtx = Arc::new(Mutex::new(establish_db_connection()));
-
+    let cert_dir = env::var("CERT_DIR").expect("CERT_DIR must be set");
+    let http_port = env::var("HTTP_PORT").expect("HTTP_PORT must be set");
+    let https_port = env::var("HTTPS_PORT").expect("HTTPS_PORT must be set");
     // load ssl keys
-    let mut config = ServerConfig::new(NoClientAuth::new());
-    let cert_file_opt = File::open("certs/cert.pem");
-    let key_file_opt = File::open("certs/key.pem");
-    if cert_file_opt.is_ok() && key_file_opt.is_ok() {
-        info!(APP_LOGGING, "Activating tls");
-        let cert_file = &mut BufReader::new(cert_file_opt.unwrap());
-        let key_file = &mut BufReader::new(key_file_opt.unwrap());
-        let cert_chain = certs(cert_file).unwrap();
-        let mut keys = rsa_private_keys(key_file).unwrap();
-        config.set_single_cert(cert_chain, keys.remove(0)).unwrap();
+    let mut ssl_builder = SslAcceptor::mozilla_intermediate(SslMethod::tls()).unwrap();
+    let cert_file_opt = File::open(format!("{}/cert.pem", cert_dir));
+    let key_file_opt = File::open(format!("{}/key.pem", cert_dir));
+    let has_tls = cert_file_opt.is_ok() && key_file_opt.is_ok();
+    if has_tls {
+        info!(APP_LOGGING, "Tls config provided");
+        ssl_builder
+            .set_private_key_file(format!("{}/key.pem", cert_dir), SslFiletype::PEM)
+            .unwrap();
+        ssl_builder
+            .set_certificate_chain_file(format!("{}/cert.pem", cert_dir))
+            .unwrap();
     } else {
         info!(APP_LOGGING, "No tls config found");
     }
 
-    HttpServer::new(move || {
+    let conn_mtx = Arc::new(Mutex::new(establish_db_connection()));
+    let server = HttpServer::new(move || {
         App::new()
             .wrap(Cors::new().finish())
             .app_data(web::Data::new(conn_mtx.clone()))
@@ -235,12 +235,34 @@ pub async fn dispatch_server() {
                     .route(web::get().to(get_shops))
                     .route(web::put().to(update_shop)),
             )
-    })
-    .bind(bind)
-    .unwrap()
-    .run()
-    .await
-    .unwrap();
+    });
+
+    let http_bind = format!("0.0.0.0:{}", http_port.clone());
+    let https_bind = format!("0.0.0.0:{}", https_port.clone());
+    if has_tls {
+        info!(
+            APP_LOGGING,
+            "Start listening to REST endpoints on {} and https redirect on {}",
+            https_bind,
+            http_bind
+        );
+        let redirect_server_fut =
+            HttpServer::new(move || App::new().wrap(RedirectHTTPS::default()))
+                .bind(http_bind.clone())
+                .unwrap()
+                .run();
+        let server_fut = server.bind_openssl(https_bind, ssl_builder).unwrap().run();
+
+        futures::future::join(redirect_server_fut, server_fut)
+            .await
+            .1
+    } else {
+        info!(
+            APP_LOGGING,
+            "Start listening to REST endpoints on {}", http_bind
+        );
+        server.bind(http_bind).unwrap().run().await
+    }
 }
 
 #[cfg(test)]
