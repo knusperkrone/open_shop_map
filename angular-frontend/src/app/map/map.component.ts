@@ -8,6 +8,7 @@ import { ShowMapDecorator } from './mapdecorator/showmapdecorator';
 import { PlacesService } from 'src/app/service/places.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { EditMapDecorator } from './mapdecorator/editmapdecorator';
+import { environment } from 'src/environments/environment';
 
 
 @Component({
@@ -60,7 +61,7 @@ export class MapComponent implements AfterViewInit, OnInit {
       zoom: zoom,
       streetViewControl: false,
       fullscreenControl: false,
-      zoomControl: false,
+      zoomControl: true,
       mapTypeControl: false,
       styles: this.decorator.getMapStyles(),
     };
@@ -95,19 +96,19 @@ export class MapComponent implements AfterViewInit, OnInit {
         this.cluster.addMarkers(markers);
       } else {
         this.cluster = new MarkerClusterer(this.map, markers,
-          { imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m' });
+          { imagePath: `${environment.assetsUrl}/cluster` });
       }
     });
   }
 
   addShopMarker(shop: Shop): google.maps.Marker {
-    let icon: string;
+    let icon: string = environment.assetsUrl;
     if (shop.donationUrl && shop.url) {
-      icon = 'assets/store_icon.png'
+      icon += 'icon_store.png'
     } else if (shop.donationUrl) {
-      icon = 'assets/donate_icon.png'
+      icon += 'icon_donate.png'
     } else {
-      icon = 'assets/shop_icon.png'
+      icon += 'icon_shop.png'
     }
     const marker = new google.maps.Marker({
       position: new google.maps.LatLng(shop.lat, shop.lon),
