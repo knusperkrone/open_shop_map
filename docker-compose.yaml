@@ -10,14 +10,14 @@ services:
       POSTGRES_PASSWORD: 0808ee1360fd717cb5a23961ddc3863f
  
   backend:
-    image: docker-registry.if-lab.de/arme/open_shop__map:latest
+    build: .
     restart: always
-    volumes:
-        - ./rust-backend/log:/home/app/rust-backend/log/
-        - ./rust-backend/certs:/home/app/rust-backend/certs/
+    # volumes:
+        #- ./rust-backend/log:/home/app/rust-backend/log/
+        # - ./rust-backend/certs:/home/app/rust-backend/certs/
     ports:
-        - 80:8080
-        - 443:8443
+        - 8080:8080
+        - 8443:8443
     links: 
         - "db_open_shop:database"
     depends_on: 

@@ -32,6 +32,7 @@ WORKDIR /home/app/rust-backend
 RUN mkdir -p ./log
 RUN mkdir -p ./certs
 RUN echo "DATABASE_URL=postgres://open_data:0808ee1360fd717cb5a23961ddc3863f@database:5432/shop_db" >> .env
+RUN echo "DATABASE_TIMEOUT=15" >> .env
 RUN echo "LOG_DIR=./log" >> .env
 RUN echo "CERT_DIR=./certs" >> .env
 RUN echo "HTTP_PORT=8080" >> .env
@@ -51,5 +52,7 @@ RUN ng build --prod --deploy-url /static/ --output-path dist/
 
 # Ready to run
 WORKDIR /home/app/rust-backend
-CMD ~/.cargo/bin/diesel migration run && \
-    ~/.cargo/bin/open_street_map_backend
+CMD ~/.cargo/bin/cargo run -- --watchdog  \
+    && sleep 5 \
+    && ~/.cargo/bin/diesel migration run  \
+    && ~/.cargo/bin/cargo run

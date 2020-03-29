@@ -210,7 +210,7 @@ pub async fn dispatch_server() -> Result<(), std::io::Error> {
         info!(APP_LOGGING, "No tls config found");
     }
 
-    let conn_mtx = Arc::new(Mutex::new(establish_db_connection()));
+    let conn_mtx = Arc::new(Mutex::new(establish_db_connection().unwrap()));
     let server = HttpServer::new(move || {
         App::new()
             .wrap(Cors::new().finish())
@@ -273,7 +273,7 @@ mod test {
 
     #[actix_rt::test]
     async fn test_healthy() {
-        let conn_mtx = Arc::new(Mutex::new(establish_db_connection()));
+        let conn_mtx = Arc::new(Mutex::new(establish_db_connection().unwrap()));
         let mut app = test::init_service(
             App::new()
                 .app_data(web::Data::new(conn_mtx.clone()))
@@ -295,7 +295,7 @@ mod test {
 
     #[actix_rt::test]
     async fn test_insert_shop() {
-        let conn_mtx = Arc::new(Mutex::new(establish_db_connection()));
+        let conn_mtx = Arc::new(Mutex::new(establish_db_connection().unwrap()));
         let mut app = test::init_service(
             App::new()
                 .app_data(web::Data::new(conn_mtx.clone()))
@@ -329,7 +329,7 @@ mod test {
 
     #[actix_rt::test]
     async fn test_update_shop() {
-        let conn_mtx = Arc::new(Mutex::new(establish_db_connection()));
+        let conn_mtx = Arc::new(Mutex::new(establish_db_connection().unwrap()));
         let mut app = test::init_service(
             App::new()
                 .app_data(web::Data::new(conn_mtx.clone()))
@@ -375,7 +375,7 @@ mod test {
 
     #[actix_rt::test]
     async fn test_get_shops() {
-        let conn_mtx = Arc::new(Mutex::new(establish_db_connection()));
+        let conn_mtx = Arc::new(Mutex::new(establish_db_connection().unwrap()));
         let mut app = test::init_service(
             App::new()
                 .app_data(web::Data::new(conn_mtx.clone()))

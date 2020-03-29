@@ -32,10 +32,10 @@ pub struct NewShop {
     pub location: GeogPoint,
 }
 
-pub fn establish_db_connection() -> PgConnection {
+pub fn establish_db_connection() -> Result<PgConnection, ConnectionError> {
     dotenv().ok();
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    PgConnection::establish(&database_url).expect(&format!("Error connecting to {}", database_url))
+    PgConnection::establish(&database_url)
 }
 
 pub fn get_shops_in_range(
@@ -78,12 +78,12 @@ mod test {
 
     #[test]
     fn test_db_connection() {
-        establish_db_connection();
+        establish_db_connection().unwrap();
     }
 
     #[test]
     fn test_insert_shop() {
-        let conn = establish_db_connection();
+        let conn = establish_db_connection().unwrap();
         let shop = NewShop {
             title: "Test Shop".to_owned(),
             url: Some("http://www.interface-ag.de".to_owned()),
@@ -101,7 +101,7 @@ mod test {
 
     #[test]
     fn test_update_shop() {
-        let conn = establish_db_connection();
+        let conn = establish_db_connection().unwrap();
         let mut shop = NewShop {
             title: "Test Shop".to_owned(),
             url: Some("http://www.interface-ag.de".to_owned()),
@@ -122,7 +122,7 @@ mod test {
 
     #[test]
     fn test_get_shops() {
-        let conn = establish_db_connection();
+        let conn = establish_db_connection().unwrap();
         let result = get_shops_in_range(
             &conn,
             GeogPoint {
