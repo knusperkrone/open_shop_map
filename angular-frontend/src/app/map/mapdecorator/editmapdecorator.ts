@@ -36,6 +36,10 @@ export class EditMapDecorator implements MapDecorator {
     }
   }
 
+  showShop(shop: Shop) {
+    this.markerClick(shop);
+  }
+
   composeMarker(marker: google.maps.Marker, shop: Shop) {
     google.maps.event.addDomListener(marker, 'rightclick', () => this.markerClick(shop));
     google.maps.event.addDomListener(marker, 'click', () => this.markerClick(shop));

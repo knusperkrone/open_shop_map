@@ -32,8 +32,12 @@ export class ShowMapDecorator implements MapDecorator {
     this.parent.map.addListener('rightclick', (event) => this.mapRightClick(event));
   }
 
+  showShop(shop: Shop) {
+    this.markerClick(shop);
+  }
+
   composeMarker(marker: google.maps.Marker, shop: Shop) {
-    google.maps.event.addDomListener(marker, 'click', () => this.markerClick(marker, shop));
+    google.maps.event.addDomListener(marker, 'click', () => this.markerClick(shop));
     google.maps.event.addDomListener(marker, 'rightclick', () => this.markerRightClick(marker, shop));
   }
 
@@ -48,11 +52,11 @@ export class ShowMapDecorator implements MapDecorator {
     });
   }
 
-  private markerClick(marker, shop: Shop) {
+  private markerClick(shop: Shop) {
     this.initIfNecessary();
     this.parent.closeOverlay();
     this.componentRef.instance.setShop(shop);
-    this.parent.infowindow.setPosition(marker.getPosition());
+    this.parent.infowindow.setPosition(new google.maps.LatLng(shop.lat, shop.lon));
     this.parent.infowindow.open(this.parent.map);
   }
 

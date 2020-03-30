@@ -1,14 +1,12 @@
 <mat-toolbar class="toolbar" color='primary'>
-  <span class="toolbar-banner">OpenShopMap</span>
+  <app-search-shop (shop)="onShop($event)"></app-search-shop>
   <span class="toolbar-spacer"></span>
-  <a href="https://wirvsvirushackathon.org/">
-    <span class="toolbar-banner">#WIRVSVIRUS</span>
-  </a>
   <button class="button-decorator" style="padding-left: 1em;" (click)="doShowTutorial()">
     <mat-icon class="icon" aria-hidden="false" aria-label="Example user verified icon">help</mat-icon>
   </button>
   <a routerLink="/about">
-    <mat-icon class="toolbar-icon" url="/about" aria-hidden="false" aria-label="Example user verified icon">contacts</mat-icon>
+    <mat-icon class="toolbar-icon" url="/about" aria-hidden="false" aria-label="Example user verified icon">contacts
+    </mat-icon>
   </a>
 </mat-toolbar>
 

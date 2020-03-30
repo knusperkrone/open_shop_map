@@ -11,22 +11,12 @@ import { environment } from '../../environments/environment';
 export class ShopService {
 
   private cachedArea: google.maps.LatLngBounds;
+  private viewArea: google.maps.LatLngBounds;
 
   constructor(private http: HttpClient) { }
 
   getShops(center: google.maps.LatLng, bounds: google.maps.LatLngBounds): Observable<ShopResponse> {
-    let range = environment.defaultRange;
-    if (bounds) {
-      // determine zoom level and increase range
-      let ne = bounds.getNorthEast();
-      let c = bounds.getCenter();
-      range = google.maps.geometry.spherical.computeDistanceBetween(ne, c);
-      range += range / 5 * 3; // increase search area
-
-      range = Math.trunc(range);
-      range = Math.max(range, environment.defaultRange);
-    }
-
+    let range = this.calcRange(bounds);
 
     let ne = google.maps.geometry.spherical.computeOffset(center, range / 2, 0);
     ne = google.maps.geometry.spherical.computeOffset(ne, range / 2, 90);
@@ -36,6 +26,13 @@ export class ShopService {
     this.cachedArea = new google.maps.LatLngBounds(sw, ne)
 
     return this.http.get(`${environment.baseUrl}api/shop?lon=${center.lng()}&lat=${center.lat()}&range=${range.toFixed(0)}`) as Observable<ShopResponse>;
+  }
+
+  searchShopsInArea(name: string): Observable<ShopResponse> {
+    let center = this.viewArea.getCenter();
+    let range = this.calcRange(this.viewArea);
+    let q = encodeURIComponent(name);
+    return this.http.get(`${environment.baseUrl}api/shop?q=${q}&lon=${center.lng()}&lat=${center.lat()}&range=${range.toFixed(0)}`) as Observable<ShopResponse>;
   }
 
   insertShops(lon: number, lat: number, title: string, url: string, donationUrl: string) {
@@ -61,12 +58,28 @@ export class ShopService {
   }
 
   updatedViewArea(area: google.maps.LatLngBounds): boolean {
+    this.viewArea = area;
     if (!this.cachedArea.contains(area.getNorthEast())) {
       return true;
     } else if (!this.cachedArea.contains(area.getSouthWest())) {
       return true;
     }
     return false;
+  }
+
+  private calcRange(bounds: google.maps.LatLngBounds): number {
+    let range = environment.defaultRange;
+    if (bounds) {
+      // determine zoom level and increase range
+      let ne = bounds.getNorthEast();
+      let c = bounds.getCenter();
+      range = google.maps.geometry.spherical.computeDistanceBetween(ne, c);
+      range += range / 5 * 3; // increase search area
+
+      range = Math.trunc(range);
+      range = Math.max(range, environment.defaultRange);
+    }
+    return range;
   }
 
 }

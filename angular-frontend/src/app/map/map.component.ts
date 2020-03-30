@@ -168,6 +168,11 @@ export class MapComponent implements AfterViewInit, OnInit {
    * UI callbacks
    */
 
+  onShop(shop: Shop) {
+    this.gmap.nativeElement.focus();
+    this.decorator.showShop(shop);
+  }
+
   doShowTutorial() {
     this.showTutorial = true;
   }

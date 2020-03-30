@@ -16,6 +16,7 @@ import { IntroTextComponent } from './map/intro/intro-text/intro-text.component'
 import { PlacesService } from './service/places.service';
 import { ShopService } from './service/shop.service';
 
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
@@ -27,6 +28,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { IntroTutorialComponent } from './map/intro/intro-tutorial/intro-tutorial.component';
+import { SearchShopComponent } from './map/search-shop/search-shop.component';
 
 
 
@@ -40,6 +42,7 @@ import { IntroTutorialComponent } from './map/intro/intro-tutorial/intro-tutoria
     AboutComponent,
     IntroTextComponent,
     IntroTutorialComponent,
+    SearchShopComponent,
   ],
   imports: [
     HttpClientModule,
@@ -48,6 +51,7 @@ import { IntroTutorialComponent } from './map/intro/intro-tutorial/intro-tutoria
     BrowserAnimationsModule,
     FormsModule,
     ReactiveFormsModule,
+    MatAutocompleteModule,
     MatButtonModule,
     MatCardModule,
     MatDividerModule,

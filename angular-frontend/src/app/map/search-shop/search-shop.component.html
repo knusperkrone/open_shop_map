@@ -1,0 +1,11 @@
+<div class="width-container">
+  <mat-icon class="icon">search</mat-icon>
+  <mat-form-field class="input">
+    <input type="text" aria-label="Number" matInput [formControl]="searchControl" [matAutocomplete]="auto">
+    <mat-autocomplete #auto="matAutocomplete">
+      <mat-option *ngFor="let shop of searchedShops | async" (onSelectionChange)="emitShop(shop)">
+        {{shop.title}}
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+</div>
