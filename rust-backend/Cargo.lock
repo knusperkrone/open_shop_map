@@ -752,6 +752,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "diesel_trgm"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9772ad64b173acf04bceca884d991413a61457a29bebe3b7c32ae786af32bd54"
+dependencies = [
+ "diesel",
+]
+
+[[package]]
 name = "digest"
 version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1486,6 +1495,7 @@ dependencies = [
  "chrono 0.4.11",
  "diesel",
  "diesel-geography",
+ "diesel_trgm",
  "dotenv",
  "env_logger",
  "futures",

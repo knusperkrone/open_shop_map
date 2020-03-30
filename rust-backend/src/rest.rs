@@ -78,6 +78,12 @@ pub mod dto {
         pub lon: f64,
         pub lat: f64,
         pub range: i32,
+        pub q: Option<String>,
+    }
+
+    #[derive(Debug, Serialize, Deserialize)]
+    pub struct SearchReqParams {
+        pub q: String,
     }
 
     impl Into<models::NewShop> for InsertShopReq {
@@ -111,23 +117,38 @@ fn get_shops(
     conn_mtx: web::Data<Arc<Mutex<PgConnection>>>,
     params: web::Query<dto::GetShopsParams>,
 ) -> HttpResponse {
-    let conn = conn_mtx.lock().unwrap();
     let location = GeogPoint {
         x: params.lon,
         y: params.lat,
         srid: None,
     };
 
-    match models::get_shops_in_range(&conn, location, params.range) {
-        Ok(shops) => {
-            info!(APP_LOGGING, "Fetched {} shops", shops.len());
-            HttpResponse::Ok().json(dto::GetShopResp::from(shops))
+    if let Some(query) = &params.q {
+        if query.len() < 2 {
+            let empty: Vec<dto::ShopDto> = Vec::new();
+            HttpResponse::Ok().json(empty)
+        } else {
+            let conn = conn_mtx.lock().unwrap();
+            match models::search_shops_in_range(&conn, query, location, params.range) {
+                Ok(shops) => HttpResponse::Ok().json(dto::GetShopResp::from(shops)),
+                Err(e) => HttpResponse::BadRequest().json(dto::ErrorResp {
+                    msg: format!("{}", e),
+                }),
+            }
         }
-        Err(e) => {
-            warn!(APP_LOGGING, "Failed fetching shops: {}", e);
-            HttpResponse::BadRequest().json(dto::ErrorResp {
-                msg: format!("{}", e),
-            })
+    } else {
+        let conn = conn_mtx.lock().unwrap();
+        match models::get_shops_in_range(&conn, location, params.range) {
+            Ok(shops) => {
+                info!(APP_LOGGING, "Fetched {} shops", shops.len());
+                HttpResponse::Ok().json(dto::GetShopResp::from(shops))
+            }
+            Err(e) => {
+                warn!(APP_LOGGING, "Failed fetching shops: {}", e);
+                HttpResponse::BadRequest().json(dto::ErrorResp {
+                    msg: format!("{}", e),
+                })
+            }
         }
     }
 }
@@ -136,7 +157,6 @@ async fn insert_shop(
     conn_mtx: web::Data<Arc<Mutex<PgConnection>>>,
     data: web::Json<dto::InsertShopReq>,
 ) -> HttpResponse {
-    let conn = conn_mtx.lock().unwrap();
     if let Err(msg) = valiator::validate_shop(&data).await {
         warn!(APP_LOGGING, "{}", msg);
         return HttpResponse::BadRequest().json(dto::ErrorResp {
@@ -144,6 +164,7 @@ async fn insert_shop(
         });
     }
 
+    let conn = conn_mtx.lock().unwrap();
     match models::insert_new_shop(&conn, &data.into_inner().into()) {
         Ok(shop) => {
             info!(APP_LOGGING, "Inserted shop: {:?}", shop);
@@ -162,8 +183,6 @@ async fn update_shop(
     conn_mtx: web::Data<Arc<Mutex<PgConnection>>>,
     data: web::Json<dto::InsertShopReq>,
 ) -> HttpResponse {
-    let conn = conn_mtx.lock().unwrap();
-
     if let Err(msg) = valiator::validate_shop(&data).await {
         warn!(APP_LOGGING, "{}", msg);
         return HttpResponse::BadRequest().json(dto::ErrorResp {
@@ -171,6 +190,7 @@ async fn update_shop(
         });
     }
 
+    let conn = conn_mtx.lock().unwrap();
     match models::update_shop(&conn, data.into_inner().into()) {
         Ok(shop) => {
             info!(APP_LOGGING, "Update shop: {:?}", shop);

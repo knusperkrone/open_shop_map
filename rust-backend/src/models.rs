@@ -1,7 +1,6 @@
 use crate::error::DBError;
 use crate::schema::shops;
 use chrono::NaiveDateTime;
-use diesel::dsl::sql_query;
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use diesel::sql_types::Float8;
@@ -40,36 +39,60 @@ pub fn establish_db_connection() -> Result<PgConnection, ConnectionError> {
 
 pub fn get_shops_in_range(
     conn: &PgConnection,
-    location: GeogPoint,
+    search_location: GeogPoint,
     distance_m: i32,
 ) -> Result<Vec<Shop>, DBError> {
-    let query = sql_query(
-        "SELECT * FROM shops
-        WHERE ST_DWithin(location, ST_MakePoint($1, $2)::geography, $3)",
-    )
-    .bind::<Float8, _>(location.x)
-    .bind::<Float8, _>(location.y)
-    .bind::<Integer, _>(distance_m);
-    let shops: Vec<Shop> = query.get_results(conn)?;
-    Ok(shops)
+    use crate::schema::shops::dsl::*;
+    use diesel::dsl::sql;
+    let query = shops.filter(
+        sql("ST_DWithin(location, ST_MakePoint(")
+            .bind::<Float8, _>(search_location.x)
+            .sql(",")
+            .bind::<Float8, _>(search_location.y)
+            .sql(")::geography,")
+            .bind::<Integer, _>(distance_m)
+            .sql(")"),
+    );
+    Ok(query.get_results(conn)?)
+}
+
+pub fn search_shops_in_range(
+    conn: &PgConnection,
+    name: &String,
+    search_location: GeogPoint,
+    distance_m: i32,
+) -> Result<Vec<Shop>, DBError> {
+    use crate::schema::shops::dsl::*;
+    use diesel::dsl::sql;
+    use diesel_trgm::*;
+    let query = shops
+        .filter(word_similarity(title, name).gt(0.4))
+        .filter(
+            sql("ST_DWithin(location, ST_MakePoint(")
+                .bind::<Float8, _>(search_location.x)
+                .sql(",")
+                .bind::<Float8, _>(search_location.y)
+                .sql(")::geography,")
+                .bind::<Integer, _>(distance_m)
+                .sql(")"),
+        )
+        .order(title.desc())
+        .limit(5);
+    Ok(query.get_results(conn)?)
 }
 
 pub fn insert_new_shop(conn: &PgConnection, new_shop: &NewShop) -> Result<Shop, DBError> {
-    let dao: Shop = diesel::insert_into(shops::table)
-        .values(new_shop)
-        .get_result(conn)?;
-    Ok(dao)
+    let query = diesel::insert_into(shops::table).values(new_shop);
+    Ok(query.get_result(conn)?)
 }
 
 pub fn update_shop(conn: &PgConnection, new_shop: NewShop) -> Result<Shop, DBError> {
     use crate::schema::shops::dsl::*;
-    let dao: Shop = diesel::update(shops)
+    let query = diesel::update(shops)
         .filter(location.eq(new_shop.location))
         .filter(title.eq(new_shop.title))
-        .set(url.eq(new_shop.url))
-        .get_result(conn)?;
-
-    Ok(dao)
+        .set(url.eq(new_shop.url));
+    Ok(query.get_result(conn)?)
 }
 
 #[cfg(test)]
@@ -85,11 +108,11 @@ mod test {
     fn test_insert_shop() {
         let conn = establish_db_connection().unwrap();
         let shop = NewShop {
-            title: "Test Shop".to_owned(),
+            title: "Models Test Shop".to_owned(),
             url: Some("http://www.interface-ag.de".to_owned()),
             donation_url: None,
             location: GeogPoint {
-                x: 11.0788608,
+                x: 04.0788608,
                 y: 49.456742399999,
                 srid: None,
             },
@@ -112,7 +135,6 @@ mod test {
                 srid: None,
             },
         };
-        
         let _ = insert_new_shop(&conn, &shop);
 
         shop.url = Some("http://www.if-lab.de".to_owned());
@@ -128,6 +150,35 @@ mod test {
             GeogPoint {
                 x: 11.0788608,
                 y: 49.456742399999996,
+                srid: None,
+            },
+            10000,
+        );
+        assert_eq!(true, result.is_ok());
+    }
+
+    #[test]
+    fn search_get_shops() {
+        let conn = establish_db_connection().unwrap();
+        let shop = NewShop {
+            title: "Test Shop".to_owned(),
+            url: Some("http://www.interface-ag.de".to_owned()),
+            donation_url: None,
+            location: GeogPoint {
+                x: 11.0788608,
+                y: 29.456742399996,
+                srid: None,
+            },
+        };
+        let _ = insert_new_shop(&conn, &shop);
+
+        let conn = establish_db_connection().unwrap();
+        let result = search_shops_in_range(
+            &conn,
+            &"Test ship".to_owned(),
+            GeogPoint {
+                x: 12.0788608,
+                y: 59.456742399999996,
                 srid: None,
             },
             10000,
