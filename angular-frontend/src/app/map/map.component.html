@@ -1,3 +1,18 @@
+<mat-toolbar class="toolbar" color='primary'>
+  <span class="toolbar-banner">OpenShopMap</span>
+  <span class="toolbar-spacer"></span>
+  <a href="https://wirvsvirushackathon.org/">
+    <span class="toolbar-banner">#WIRVSVIRUS</span>
+  </a>
+  <button class="button-decorator" style="padding-left: 1em;" (click)="doShowTutorial()">
+    <mat-icon class="icon" aria-hidden="false" aria-label="Example user verified icon">help</mat-icon>
+  </button>
+  <a routerLink="/about">
+    <mat-icon class="toolbar-icon" url="/about" aria-hidden="false" aria-label="Example user verified icon">contacts</mat-icon>
+  </a>
+</mat-toolbar>
+
+
 <div #mapContainer id="map"></div>
 
 <div #infoContainer class="infowindow-content">
@@ -7,7 +22,9 @@
 <ng-template #clickContent class="infowindow-content"></ng-template>
 
 <div class="fab-container">
-  <button mat-fab color="primary" (click)="switchMode()"><mat-icon>edit</mat-icon></button>
+  <button mat-fab color="primary" (click)="switchMode()">
+    <mat-icon>edit</mat-icon>
+  </button>
 </div>
 
 <div *ngIf="showTutorial" class="mat-tab-fill-height">

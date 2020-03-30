@@ -168,6 +168,9 @@ export class MapComponent implements AfterViewInit, OnInit {
    * UI callbacks
    */
 
+  doShowTutorial() {
+    this.showTutorial = true;
+  }
 
   closeTutorial() {
     this.showTutorial = false;

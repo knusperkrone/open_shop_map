@@ -1,3 +1,36 @@
+a {
+  text-decoration: none;
+}
+
+.toolbar{
+  min-height:64px;
+  max-height:64px
+}
+
+.toolbar-icon {
+  padding: 0 14px;
+  padding-top: 9px;
+  color: white;
+}
+
+.toolbar-banner {
+  color: white;
+}
+
+.toolbar-spacer {
+  flex: 1 1 auto;
+}
+
+.button-decorator {
+  background-color: Transparent;
+  background-repeat:no-repeat;
+  color: rgba($color: #fff, $alpha: 0.9);
+  border: none;
+  cursor:pointer;
+  overflow: hidden;
+  outline:none;
+}
+
 .infowindow-content {
   display: none;
 }
