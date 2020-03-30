@@ -9,8 +9,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AboutComponent } from './about/about.component';
 import { MapComponent } from "./map/map.component";
+import { ClickContentComponent } from './map/clickcontent/clickcontent.component';
 import { ShowContentComponent } from './map/showcontent/showcontent.component';
 import { EditContentComponent } from './map/editcontent/editcontent.component';
+import { IntroTextComponent } from './map/intro/intro-text/intro-text.component';
 import { PlacesService } from './service/places.service';
 import { ShopService } from './service/shop.service';
 
@@ -22,8 +24,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBarModule } from '@angular/material/snack-bar'
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { ClickContentComponent } from './map/clickcontent/clickcontent.component';
+import { IntroTutorialComponent } from './map/intro/intro-tutorial/intro-tutorial.component';
+
 
 
 @NgModule({
@@ -34,6 +38,8 @@ import { ClickContentComponent } from './map/clickcontent/clickcontent.component
     EditContentComponent,
     ClickContentComponent,
     AboutComponent,
+    IntroTextComponent,
+    IntroTutorialComponent,
   ],
   imports: [
     HttpClientModule,
@@ -50,6 +56,7 @@ import { ClickContentComponent } from './map/clickcontent/clickcontent.component
     MatFormFieldModule,
     MatSlideToggleModule,
     MatSnackBarModule,
+    MatTabsModule,
     MatToolbarModule,
   ],
   providers: [PlacesService, ShopService],

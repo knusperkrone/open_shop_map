@@ -1,0 +1,47 @@
+.container {
+  width: 100%;
+  height: 91.65vh;
+  background-color: rgba($color: #000000, $alpha: 0.9);
+}
+
+.text-container {
+  padding: 5em 2em;
+  margin: auto;
+  max-width: 640px;
+  color: white;
+}
+
+h1 {
+  color: #ff8100;
+}
+
+h2 {
+  color: #ff8100;
+}
+
+a {
+  color: #ff9426;
+}
+
+.button-decorator {
+  background-color: Transparent;
+  background-repeat:no-repeat;
+  color: rgba($color: #fff, $alpha: 0.9);
+  border: none;
+  cursor:pointer;
+  overflow: hidden;
+  outline:none;
+}
+
+.close-button {
+  position: absolute;
+  top: 1em;
+  right: 1em;
+}
+
+.next-button {
+  position: absolute;
+  height: 6em;
+  top: 40vh;
+  left: 5px;
+}

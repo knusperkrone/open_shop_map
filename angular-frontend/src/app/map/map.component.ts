@@ -1,7 +1,7 @@
 import { Component, ViewChild, ElementRef, AfterViewInit, ComponentFactoryResolver, ViewContainerRef, Renderer2, OnInit } from '@angular/core';
 import { ShopService } from '../service/shop.service';
 import { Shop } from '../models/dto';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { ClickContentComponent } from './clickcontent/clickcontent.component';
 import { MapDecorator } from './mapdecorator/mapdecorator';
 import { ShowMapDecorator } from './mapdecorator/showmapdecorator';
@@ -30,11 +30,24 @@ export class MapComponent implements AfterViewInit, OnInit {
 
   private overlay: google.maps.OverlayView;
   private isEditing = false;
+  showTutorial: boolean;
+  tabIndex: number = 0;
 
-  constructor(public shopService: ShopService, public router: Router, public snackBar: MatSnackBar, public placeService: PlacesService, public componentFactoryResolver: ComponentFactoryResolver, public renderer: Renderer2) { }
+  constructor(public shopService: ShopService, public router: Router, public snackBar: MatSnackBar, public placeService: PlacesService, public componentFactoryResolver: ComponentFactoryResolver, public renderer: Renderer2) {
+    this.router.routeReuseStrategy.shouldReuseRoute = function () {
+      return false;
+    };
+    this.showTutorial = router.getCurrentNavigation().extras?.state?.showIntro ?? false;
+  }
 
   ngOnInit(): void {
     this.decorator = new ShowMapDecorator(this);
+    if (!localStorage.isNotFirstVisit || this.showTutorial) {
+      this.showTutorial = true;
+      localStorage.isNotFirstVisit = true;
+    } else {
+      this.showTutorial = false;
+    }
   }
 
   ngAfterViewInit(): void {
@@ -150,6 +163,23 @@ export class MapComponent implements AfterViewInit, OnInit {
     this.overlay?.onRemove();
     this.overlay = null;
   }
+
+  /*
+   * UI callbacks
+   */
+
+
+  closeTutorial() {
+    this.showTutorial = false;
+  }
+
+  changeTab(offset: number) {
+    this.tabIndex += offset;
+  }
+
+  /*
+   * Helpers
+   */
 
   private geolocationFallback(msg: any) {
     if (msg) {
