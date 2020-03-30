@@ -36,6 +36,10 @@ export class ShowMapDecorator implements MapDecorator {
     this.markerClick(shop);
   }
 
+  showPlace(place: google.maps.places.PlaceResult) {
+    throw new Error("Method not implemented.");
+  }
+
   composeMarker(marker: google.maps.Marker, shop: Shop) {
     google.maps.event.addDomListener(marker, 'click', () => this.markerClick(shop));
     google.maps.event.addDomListener(marker, 'rightclick', () => this.markerRightClick(marker, shop));

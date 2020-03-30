@@ -9,6 +9,8 @@ import { PlacesService } from 'src/app/service/places.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { EditMapDecorator } from './mapdecorator/editmapdecorator';
 import { environment } from 'src/environments/environment';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { NewShopDialogComponent } from './new-shop-dialog/new-shop-dialog.component';
 
 
 @Component({
@@ -29,11 +31,13 @@ export class MapComponent implements AfterViewInit, OnInit {
   decorator: MapDecorator;
 
   private overlay: google.maps.OverlayView;
+  private dialogRef: MatDialogRef<any>;
   private isEditing = false;
   showTutorial: boolean;
   tabIndex: number = 0;
 
-  constructor(public shopService: ShopService, public router: Router, public snackBar: MatSnackBar, public placeService: PlacesService, public componentFactoryResolver: ComponentFactoryResolver, public renderer: Renderer2) {
+
+  constructor(public shopService: ShopService, public placeService: PlacesService, public router: Router, public dialog: MatDialog, public snackBar: MatSnackBar, public componentFactoryResolver: ComponentFactoryResolver, public renderer: Renderer2) {
     this.router.routeReuseStrategy.shouldReuseRoute = function () {
       return false;
     };
@@ -79,8 +83,8 @@ export class MapComponent implements AfterViewInit, OnInit {
       styles: this.decorator.getMapStyles(),
     };
     this.map = new google.maps.Map(this.gmap.nativeElement, mapOptions);
-    this.map.addListener("dragstart", (_) => { this.overlay?.onRemove(); this.overlay = null });
-    this.map.addListener("click", (_) => { this.overlay?.onRemove(); this.overlay = null });
+    this.map.addListener("dragstart", (_) => { this.overlay?.onRemove(); this.overlay = null; this.dialogRef?.close(); });
+    this.map.addListener("click", (_) => { this.overlay?.onRemove(); this.overlay = null; this.dialogRef?.close(); });
     this.placeService.init(this.map);
 
     const me = this;
@@ -171,6 +175,23 @@ export class MapComponent implements AfterViewInit, OnInit {
   onShop(shop: Shop) {
     this.gmap.nativeElement.focus();
     this.decorator.showShop(shop);
+  }
+
+  newDialog(title: string) {
+    this.dialogRef = this.dialog.open(NewShopDialogComponent, {
+      width: '450px',
+      hasBackdrop: false,
+      data: { title: title ?? "", map: this.map },
+    });
+
+    this.dialogRef.afterClosed().subscribe((place) => {
+      if (place) {
+        if (!this.isEditing) {
+          this.switchMode();
+        }
+        this.decorator.showPlace(place);
+      }
+    });
   }
 
   doShowTutorial() {

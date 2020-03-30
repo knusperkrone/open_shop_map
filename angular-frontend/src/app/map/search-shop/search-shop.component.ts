@@ -14,6 +14,7 @@ export class SearchShopComponent implements OnInit {
   searchControl: FormControl;
   searchedShops: Subject<Array<Shop>>;
 
+  @Output() new: EventEmitter<string> = new EventEmitter();
   @Output() shop: EventEmitter<Shop> = new EventEmitter();
 
   constructor(private serivce: ShopService) { }
@@ -22,7 +23,7 @@ export class SearchShopComponent implements OnInit {
     this.searchedShops = new Subject();
     this.searchControl = new FormControl();
     this.searchControl.valueChanges.subscribe((value: string) => {
-      if (value && value.length <= 2) {
+      if (!value || value.length <= 2) {
         this.searchedShops.next([]);
       } else {
         this.serivce.searchShopsInArea(value).subscribe((resp) => {
@@ -30,6 +31,10 @@ export class SearchShopComponent implements OnInit {
         });
       }
     });
+  }
+
+  emitNew() {
+    this.new.next(this.searchControl.value);
   }
 
   emitShop(shop: Shop) {

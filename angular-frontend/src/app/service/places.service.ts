@@ -5,16 +5,16 @@ import { Injectable } from '@angular/core';
 })
 export class PlacesService {
 
-  private serivce: google.maps.places.PlacesService;
+  private service: google.maps.places.PlacesService;
 
   constructor() { }
 
   init(map) {
-    this.serivce = new google.maps.places.PlacesService(map);
+    this.service = new google.maps.places.PlacesService(map);
   }
 
   getInformation(placeId, callback) {
-    this.serivce.getDetails({ placeId: placeId }, callback);
+    this.service.getDetails({ placeId: placeId }, callback);
   }
 
 }

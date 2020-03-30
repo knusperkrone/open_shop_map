@@ -13,12 +13,14 @@ import { ClickContentComponent } from './map/clickcontent/clickcontent.component
 import { ShowContentComponent } from './map/showcontent/showcontent.component';
 import { EditContentComponent } from './map/editcontent/editcontent.component';
 import { IntroTextComponent } from './map/intro/intro-text/intro-text.component';
+import { NewShopDialogComponent } from './map/new-shop-dialog/new-shop-dialog.component';
 import { PlacesService } from './service/places.service';
 import { ShopService } from './service/shop.service';
 
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -43,7 +45,9 @@ import { SearchShopComponent } from './map/search-shop/search-shop.component';
     IntroTextComponent,
     IntroTutorialComponent,
     SearchShopComponent,
+    NewShopDialogComponent,
   ],
+  entryComponents: [NewShopDialogComponent],
   imports: [
     HttpClientModule,
     BrowserModule,
@@ -54,6 +58,7 @@ import { SearchShopComponent } from './map/search-shop/search-shop.component';
     MatAutocompleteModule,
     MatButtonModule,
     MatCardModule,
+    MatDialogModule,
     MatDividerModule,
     MatIconModule,
     MatInputModule,

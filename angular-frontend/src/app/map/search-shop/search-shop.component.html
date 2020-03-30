@@ -6,6 +6,9 @@
       <mat-option *ngFor="let shop of searchedShops | async" (onSelectionChange)="emitShop(shop)">
         {{shop.title}}
       </mat-option>
+      <mat-option (onSelectionChange)="emitNew()">
+        <mat-icon color="accent">add</mat-icon> Neuer Shop
+      </mat-option>
     </mat-autocomplete>
   </mat-form-field>
 </div>

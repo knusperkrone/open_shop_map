@@ -11,7 +11,8 @@ import { environment } from '../../environments/environment';
 export class ShopService {
 
   private cachedArea: google.maps.LatLngBounds;
-  private viewArea: google.maps.LatLngBounds;
+  private cachedShops: Array<Shop>;
+  viewArea: google.maps.LatLngBounds;
 
   constructor(private http: HttpClient) { }
 
@@ -25,7 +26,9 @@ export class ShopService {
     //const nw = google.maps.geometry.spherical.computeOffset(sw, range, 0);
     this.cachedArea = new google.maps.LatLngBounds(sw, ne)
 
-    return this.http.get(`${environment.baseUrl}api/shop?lon=${center.lng()}&lat=${center.lat()}&range=${range.toFixed(0)}`) as Observable<ShopResponse>;
+    let shops = this.http.get(`${environment.baseUrl}api/shop?lon=${center.lng()}&lat=${center.lat()}&range=${range.toFixed(0)}`) as Observable<ShopResponse>;
+    shops.subscribe((resp) => this.cachedShops = resp.items);
+    return shops;
   }
 
   searchShopsInArea(name: string): Observable<ShopResponse> {
@@ -65,6 +68,17 @@ export class ShopService {
       return true;
     }
     return false;
+  }
+
+  containsPlace(place): Shop | null {
+    const lat = place.geometry.location.lat();
+    const lng = place.geometry.location.lng();
+    for (const shop of this.cachedShops) {
+      if (shop.title === place.name && shop.lat === lat && shop.lon == lng) {
+        return shop;
+      }
+    }
+    return null;
   }
 
   private calcRange(bounds: google.maps.LatLngBounds): number {

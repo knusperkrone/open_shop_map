@@ -40,6 +40,21 @@ export class EditMapDecorator implements MapDecorator {
     this.markerClick(shop);
   }
 
+  showPlace(place: google.maps.places.PlaceResult) {
+    this.initIfNecessary();
+    let shop = this.parent.shopService.containsPlace(place);
+    if (shop) {
+      // old place
+      this.componentRef.instance.setShop(shop);
+      this.parent.infowindow.setPosition(new google.maps.LatLng(shop.lat, shop.lon));
+    } else {
+      // new place
+      this.componentRef.instance.setPlace(place);
+      this.parent.infowindow.setPosition(place.geometry.location);
+    }
+    this.parent.infowindow.open(this.parent.map);
+  }
+
   composeMarker(marker: google.maps.Marker, shop: Shop) {
     google.maps.event.addDomListener(marker, 'rightclick', () => this.markerClick(shop));
     google.maps.event.addDomListener(marker, 'click', () => this.markerClick(shop));
@@ -63,11 +78,7 @@ export class EditMapDecorator implements MapDecorator {
       event,
       () => {
         this.parent.closeOverlay();
-        this.parent.map.setZoom(Math.max(16, this.parent.map.getZoom()));
-        this.parent.map.panTo(event.latLng);
-        this.parent.snackBar.open(`Um einen Shop hinzuzufügen klicke auf einen Maps Eintrag!`, "Ok", {
-          duration: 6000,
-        });
+        this.parent.newDialog("");
       },
     );
   }
