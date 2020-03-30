@@ -66,7 +66,7 @@ pub fn search_shops_in_range(
     use diesel::dsl::sql;
     use diesel_trgm::*;
     let query = shops
-        .filter(word_similarity(title, name).gt(0.4))
+        .filter(word_similarity(title, name).gt(0.1))
         .filter(
             sql("ST_DWithin(location, ST_MakePoint(")
                 .bind::<Float8, _>(search_location.x)
