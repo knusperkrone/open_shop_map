@@ -80,6 +80,7 @@ export class MapComponent implements AfterViewInit, OnInit {
       fullscreenControl: false,
       zoomControl: true,
       mapTypeControl: false,
+      gestureHandling: 'cooperative',
       styles: this.decorator.getMapStyles(),
     };
     this.map = new google.maps.Map(this.gmap.nativeElement, mapOptions);
